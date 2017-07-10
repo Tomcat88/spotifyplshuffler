@@ -2,11 +2,12 @@ package it.introini.spotifyplshuffler.spotify
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyUser( @JsonProperty("display_name") val displayName: String,
                         @JsonProperty("country")      val country: String,
-                        @JsonProperty("birthdate")    val birthDate: String,
+                        @JsonProperty("birthdate")    val birthDate: LocalDate,
                         @JsonProperty("email")        val email: String,
                         @JsonProperty("id")           val id: String,
                         @JsonProperty("product")      val product: String,

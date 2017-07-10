@@ -47,8 +47,10 @@ class LoginCBHandler @Inject constructor(val stateManager: StateManager,
                         spotifyClient.getMe(token, meFuture)
                         meFuture.setHandler {
                             if (it.succeeded()) {
-                                Logger.info(it.result())
-                                response.end(JsonObject().put("userId", userId).encode())
+                                val spotifyUser = it.result()
+                                Logger.info(spotifyUser)
+                                response.end(JsonObject().put("userId", userId)
+                                                         .put("spotify_user", JsonObject.mapFrom(spotifyUser)).encode())
                             } else {
                                 event.fail(it.cause())
                             }

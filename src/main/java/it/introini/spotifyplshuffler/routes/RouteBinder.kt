@@ -2,11 +2,13 @@ package it.introini.spotifyplshuffler.routes
 
 import com.google.inject.Inject
 import com.google.inject.Injector
+import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CookieHandler
 import io.vertx.ext.web.handler.LoggerHandler
 import it.introini.spotifyplshuffler.config.Config
+import org.pmw.tinylog.Logger
 
 
 class RouteBinder @Inject constructor(val injector: Injector,
@@ -22,6 +24,10 @@ class RouteBinder @Inject constructor(val injector: Injector,
         router.route("$API_ROOT/*").handler(CookieHandler.create())
         routes.forEach {
             router.route(it.method, "$API_ROOT${it.endpoint}").blockingHandler(injector.getInstance(it.handler))
+        }
+        router.route("$API_ROOT/*").failureHandler {
+            Logger.error(it.failure(), "Unknown exception")
+            it.fail(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
         }
     }
 }
