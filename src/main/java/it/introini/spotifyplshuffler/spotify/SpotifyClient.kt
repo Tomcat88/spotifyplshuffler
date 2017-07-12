@@ -19,9 +19,12 @@ import java.util.*
 class SpotifyClient @Inject constructor(val config: Config,
                                         val vertx: Vertx){
 
-    val AUTH_URL   = "https://accounts.spotify.com/authorize"
-    val TOKENS_URL = "https://accounts.spotify.com/api/token"
-    val ME_URL     = "https://api.spotify.com/v1/me"
+    val AUTH_URL     = "https://accounts.spotify.com/authorize"
+    val TOKENS_URL   = "https://accounts.spotify.com/api/token"
+
+    val BASE_API_URL = "https://api.spotify.com/v1"
+    val ME_URL       = "$BASE_API_URL/me"
+    val ME_PLAYLISTS = "$BASE_API_URL/me/playlists"
 
     val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -62,25 +65,14 @@ class SpotifyClient @Inject constructor(val config: Config,
     }
 
     fun getMe(token: Token, future: Future<SpotifyUser>) {
-        val auth = getTokenAuthorizationHeader(token.accessToken)
-        val req = httpClient.getAbs(ME_URL) {
-            if (it.statusCode() == HttpResponseStatus.OK.code()) {
-                it.bodyHandler {
-                    future.complete(it.toJsonObject().mapTo(SpotifyUser::class.java))
-                }
-            } else {
-                it.bodyHandler {
-                    future.fail("Error while requesting user $it")
-                }
-            }
-        }
-        req.exceptionHandler {
-            future.fail(it)
-        }
-        req.setTimeout(5000L)
-        req.putHeader(HttpHeaders.AUTHORIZATION, auth)
-        req.end()
+        getRequest(ME_URL, token, future)
     }
+
+    fun getPlaylists(token: Token, future: Future<PagingObject<SpotifyPlaylist>>) {
+        getRequest(ME_PLAYLISTS, token, future)
+    }
+
+    // private utils
 
     private fun getTokenAuthorizationHeader(accessToken: String): String {
         return "Bearer $accessToken"
@@ -92,5 +84,26 @@ class SpotifyClient @Inject constructor(val config: Config,
         val auth = "$clientId:$clientSecret"
         val base64 = Base64.getEncoder().encodeToString(auth.toByteArray())
         return "Basic $base64"
+    }
+
+    inline private fun <reified T> getRequest(url: String, token: Token, future: Future<T>) {
+        val auth = getTokenAuthorizationHeader(token.accessToken)
+        val req = httpClient.getAbs(url) {
+            if (it.statusCode() == HttpResponseStatus.OK.code()) {
+                it.bodyHandler {
+                    future.complete(it.toJsonObject().mapTo(T::class.java))
+                }
+            } else {
+                it.bodyHandler {
+                    future.fail("Error while performing get request $url $it")
+                }
+            }
+        }
+        req.exceptionHandler {
+            future.fail(it)
+        }
+        req.setTimeout(5000L)
+        req.putHeader(HttpHeaders.AUTHORIZATION, auth)
+        req.end()
     }
 }

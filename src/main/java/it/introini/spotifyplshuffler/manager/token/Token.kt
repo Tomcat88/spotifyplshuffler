@@ -1,16 +1,18 @@
 package it.introini.spotifyplshuffler.manager.token
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
 
-data class Token(@JsonProperty("token_type")    val tokenType: String,
-                 @JsonProperty("access_token")  val accessToken: String,
-                 @JsonProperty("refresh_token") val refreshToken: String,
-                 @JsonProperty("expires_in")    val expiresIn: Long,
-                 @JsonProperty("scope")         val scope: String,
-                 @JsonProperty("created_on")    val createdOn: Instant,
-                 @JsonProperty("user_id")       val userId: String) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Token(@JsonProperty("tokenType")    val tokenType: String,
+                 @JsonProperty("accessToken")  val accessToken: String,
+                 @JsonProperty("refreshToken") val refreshToken: String,
+                 @JsonProperty("expiresIn")    val expiresIn: Long,
+                 @JsonProperty("scope")        val scope: String,
+                 @JsonProperty("createdOn")    val createdOn: Instant,
+                 @JsonProperty("userId")       val userId: String) {
 
     fun getExpireTime() = createdOn.plusSeconds(expiresIn)
 }

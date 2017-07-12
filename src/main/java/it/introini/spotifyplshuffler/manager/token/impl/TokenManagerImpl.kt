@@ -3,6 +3,7 @@ package it.introini.spotifyplshuffler.manager.token.impl
 import com.google.inject.Inject
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
+import com.mongodb.client.model.Filters
 import io.vertx.core.json.JsonObject
 import it.introini.spotifyplshuffler.manager.token.Token
 import it.introini.spotifyplshuffler.manager.token.TokenManager
@@ -21,10 +22,10 @@ class TokenManagerImpl @Inject constructor(mongoDatabase: MongoDatabase): TokenM
     }
 
     override fun deleteToken(userId: String): Boolean {
-        return collection.deleteOne(Document("user_id", userId)).deletedCount == 1L
+        return collection.deleteOne(Filters.eq("userId", userId)).deletedCount == 1L
     }
 
     override fun getToken(userId: String): Token? {
-        return collection.find(Document("user_id", userId)).limit(1).map { JsonObject(it.toMap()).mapTo(Token::class.java) }.firstOrNull()
+        return collection.find(Filters.eq("userId", userId)).limit(1).map { JsonObject(it.toMap()).mapTo(Token::class.java) }.firstOrNull()
     }
 }
