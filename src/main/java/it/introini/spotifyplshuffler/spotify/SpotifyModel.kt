@@ -20,9 +20,10 @@ data class SpotifyImage( @JsonProperty("height") val height: Int?,
                          @JsonProperty("width")  val width: Int?,
                          @JsonProperty("url")    val url: String )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyPlaylist (
     @JsonProperty("collaborative") val collaborative: Boolean,
-    @JsonProperty("description")   val description: String,
+    @JsonProperty("description")   val description: String?,
     @JsonProperty("href")          val href: String,
     @JsonProperty("id")            val id: String,
     @JsonProperty("images")        val spotifyImages: Collection<SpotifyImage>,
@@ -40,7 +41,7 @@ data class TracksObject (
 )
 
 data class PagingObject<out T> (
-    @JsonProperty("items")    val items: Collection<T>,
+    @JsonProperty("items")    val items: List<T>,
     @JsonProperty("href")     val href: String,
     @JsonProperty("limit")    val limit: Int,
     @JsonProperty("next")     val next: String,

@@ -1,5 +1,6 @@
 package it.introini.spotifyplshuffler.handlers
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -13,6 +14,7 @@ import it.introini.spotifyplshuffler.spotify.PagingObject
 import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import it.introini.spotifyplshuffler.spotify.SpotifyPlaylist
 import java.util.*
+import java.util.stream.Collectors
 
 
 class PlaylistHandler @Inject constructor(val spotifyClient: SpotifyClient,
@@ -27,15 +29,18 @@ class PlaylistHandler @Inject constructor(val spotifyClient: SpotifyClient,
         }
         //TODO Check if token is expired
         if (token == null) {
-            event.fail(HttpResponseStatus.UNAUTHORIZED.code())
+            event.response().statusCode = HttpResponseStatus.UNAUTHORIZED.code()
+            event.response().end()
         } else {
             val future = Future.future<PagingObject<SpotifyPlaylist>>()
             spotifyClient.getPlaylists(token, future)
-            future.setHandler {
-                if (it.succeeded()) {
-                    event.response().end(it.result().items.map { JsonObject.mapFrom(it) }.let { JsonArray(it) }.encode())
+            future.setHandler { result ->
+                if (result.succeeded()) {
+                    event.response().putHeader(HttpHeaderNames.CONTENT_TYPE, "application/json")
+                    event.response().end(JsonObject.mapFrom(result.result()).encode())
                 } else {
-                    event.fail(it.cause())
+
+                    event.fail(result.cause())
                 }
             }
         }

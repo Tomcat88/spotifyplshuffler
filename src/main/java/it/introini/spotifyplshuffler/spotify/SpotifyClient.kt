@@ -1,5 +1,6 @@
 package it.introini.spotifyplshuffler.spotify
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.QueryStringEncoder
@@ -8,6 +9,7 @@ import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.http.HttpClient
 import io.vertx.core.http.HttpHeaders
+import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import it.introini.spotifyplshuffler.config.Config
 import it.introini.spotifyplshuffler.config.Parameter
@@ -69,7 +71,7 @@ class SpotifyClient @Inject constructor(val config: Config,
     }
 
     fun getPlaylists(token: Token, future: Future<PagingObject<SpotifyPlaylist>>) {
-        getRequest(ME_PLAYLISTS, token, future)
+        getRequest(ME_PLAYLISTS, token, future, object : TypeReference<PagingObject<SpotifyPlaylist>>() {})
     }
 
     // private utils
@@ -86,15 +88,20 @@ class SpotifyClient @Inject constructor(val config: Config,
         return "Basic $base64"
     }
 
-    inline private fun <reified T> getRequest(url: String, token: Token, future: Future<T>) {
+    inline private fun <reified T> getRequest(url: String, token: Token, future: Future<T>, typeReference: TypeReference<*>? = null) {
         val auth = getTokenAuthorizationHeader(token.accessToken)
         val req = httpClient.getAbs(url) {
             if (it.statusCode() == HttpResponseStatus.OK.code()) {
                 it.bodyHandler {
-                    future.complete(it.toJsonObject().mapTo(T::class.java))
+                    if (typeReference == null) {
+                        future.complete(it.toJsonObject().mapTo(T::class.java))
+                    } else {
+                        future.complete(Json.mapper.convertValue(it.toJsonObject().map, typeReference))
+                    }
                 }
             } else {
                 it.bodyHandler {
+                    //TODO Improve
                     future.fail("Error while performing get request $url $it")
                 }
             }

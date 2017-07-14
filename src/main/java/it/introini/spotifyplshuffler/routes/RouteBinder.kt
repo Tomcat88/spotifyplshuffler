@@ -27,7 +27,8 @@ class RouteBinder @Inject constructor(val injector: Injector,
         }
         router.route("$API_ROOT/*").failureHandler {
             Logger.error(it.failure(), "Unknown exception")
-            it.fail(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
+            it.response().statusCode = HttpResponseStatus.INTERNAL_SERVER_ERROR.code()
+            it.response().end()
         }
     }
 }
