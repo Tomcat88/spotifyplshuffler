@@ -75,10 +75,15 @@ class SpotifyClient @Inject constructor(val config: Config,
         getRequest(ME_PLAYLISTS, token, future, object : TypeReference<PagingObject<SpotifyPlaylist>>() {})
     }
 
-    fun getPlaylistTracks(token: Token, userId: String, playlist: String, future: Future<PagingObject<SpotifyPlaylistTrack>>) {
-        val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", userId)
-                                             .replace("{playlist_id}", playlist)
-        getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
+    fun getPlaylistTracks(token: Token, playlist: String, future: Future<PagingObject<SpotifyPlaylistTrack>>) {
+        val spotifyUser = token.spotifyUser
+        if (spotifyUser == null) {
+            future.fail("Spotify user not found in token!")
+        } else {
+            val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", spotifyUser)
+                                                 .replace("{playlist_id}", playlist)
+            getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
+        }
     }
 
     // private utils

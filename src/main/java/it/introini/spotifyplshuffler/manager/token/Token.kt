@@ -2,17 +2,28 @@ package it.introini.spotifyplshuffler.manager.token
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import it.introini.spotifyplshuffler.spotify.Encodable
+import it.introini.spotifyplshuffler.spotify.SpotifyUser
 import java.time.Instant
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Token(@JsonProperty("tokenType")    val tokenType: String,
-                 @JsonProperty("accessToken")  val accessToken: String,
-                 @JsonProperty("refreshToken") val refreshToken: String,
-                 @JsonProperty("expiresIn")    val expiresIn: Long,
-                 @JsonProperty("scope")        val scope: String,
-                 @JsonProperty("createdOn")    val createdOn: Instant,
-                 @JsonProperty("userId")       val userId: String) {
+class Token(@JsonProperty("token_type")    tokenType: String,
+            @JsonProperty("access_token")  accessToken: String,
+            @JsonProperty("refresh_token") refreshToken: String,
+            @JsonProperty("expires_n")     expiresIn: Long,
+            @JsonProperty("scope")         scope: String,
+            @JsonProperty("created_on")    createdOn: Instant,
+            @JsonProperty("user_id")       userId: String): Encodable {
 
-    fun getExpireTime() = createdOn.plusSeconds(expiresIn)
+    val tokenType:    String   = tokenType    @JsonProperty("token_type")    get
+    val accessToken:  String   = accessToken  @JsonProperty("access_token")  get
+    val refreshToken: String   = refreshToken @JsonProperty("refresh_token") get
+    val expiresIn:    Long     = expiresIn    @JsonProperty("expires_in")    get
+    val scope:        String   = scope        @JsonProperty("scope")         get
+    val createdOn:    Instant  = createdOn    @JsonProperty("created_on")    get
+    val userId:       String   = userId       @JsonProperty("user_id")       get
+    val spotifyUser:  String?  = null         @JsonProperty("spotify_user")  get
+    
+    val expireTime:   Instant      = createdOn.plusSeconds(expiresIn)
 }

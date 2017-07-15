@@ -2,8 +2,14 @@ package it.introini.spotifyplshuffler.spotify
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.vertx.core.json.JsonObject
 import java.time.Instant
 import java.time.LocalDate
+
+interface Encodable {
+    fun toJson(): JsonObject = JsonObject.mapFrom(this)
+    fun encode(): String = JsonObject.mapFrom(this).encode()
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyUser( @JsonProperty("display_name") val displayName: String,
@@ -14,11 +20,11 @@ data class SpotifyUser( @JsonProperty("display_name") val displayName: String,
                         @JsonProperty("product")      val product: String,
                         @JsonProperty("type")         val type: String,
                         @JsonProperty("uri")          val uri: String,
-                        @JsonProperty("images")       val spotifyImage: Collection<SpotifyImage> )
+                        @JsonProperty("images")       val spotifyImage: Collection<SpotifyImage> ) : Encodable
 
 data class SpotifyImage( @JsonProperty("height") val height: Int?,
                          @JsonProperty("width")  val width: Int?,
-                         @JsonProperty("url")    val url: String )
+                         @JsonProperty("url")    val url: String ) : Encodable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyPlaylist (
@@ -33,12 +39,12 @@ data class SpotifyPlaylist (
     @JsonProperty("type")          val type: String,
     @JsonProperty("uri")           val uri: String,
     @JsonProperty("tracks")        val tracks: TracksObject
-)
+): Encodable
 
 data class TracksObject (
     @JsonProperty("href")  val href: String,
     @JsonProperty("total") val total: Int
-)
+): Encodable
 
 data class PagingObject<out T> (
     @JsonProperty("items")    val items: List<T>,
@@ -48,13 +54,13 @@ data class PagingObject<out T> (
     @JsonProperty("offset")   val offset: Int,
     @JsonProperty("previous") val previous: Int,
     @JsonProperty("total")    val total: Int
-)
+): Encodable
 
 data class SpotifyPlaylistTrack (
     @JsonProperty("added_at") val addedAt: Instant,
     @JsonProperty("is_local") val isLocal: Boolean,
     @JsonProperty("track")    val track: SpotifyTrack
-)
+): Encodable
 
 data class SpotifyTrack (
     @JsonProperty("id")                val id: String,
@@ -71,7 +77,7 @@ data class SpotifyTrack (
     @JsonProperty("track_number")      val trackNumber: Int,
     @JsonProperty("type")              val type: String,
     @JsonProperty("uri")               val uri: String
-)
+): Encodable
 
 data class SpotifyArtist (
     @JsonProperty("id")   val id: String,
@@ -79,7 +85,7 @@ data class SpotifyArtist (
     @JsonProperty("name") val name: String,
     @JsonProperty("type") val type: String,
     @JsonProperty("uri")  val uri: String
-)
+): Encodable
 
 // ==== ERRORS ====
 
