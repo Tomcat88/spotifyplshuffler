@@ -56,12 +56,14 @@ data class PagingObject<out T> (
     @JsonProperty("total")    val total: Int
 ): Encodable
 
-data class SpotifyPlaylistTrack (
+data@JsonIgnoreProperties(ignoreUnknown = true)
+class SpotifyPlaylistTrack (
     @JsonProperty("added_at") val addedAt: Instant,
     @JsonProperty("is_local") val isLocal: Boolean,
     @JsonProperty("track")    val track: SpotifyTrack
 ): Encodable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyTrack (
     @JsonProperty("id")                val id: String,
     @JsonProperty("name")              val name: String,
@@ -73,12 +75,13 @@ data class SpotifyTrack (
     @JsonProperty("href")              val href: String,
     @JsonProperty("is_playable")       val isPlayable: Boolean,
     @JsonProperty("popularity")        val popularity: Int,
-    @JsonProperty("preview_url")       val previewUrl: String,
+    @JsonProperty("preview_url")       val previewUrl: String?,
     @JsonProperty("track_number")      val trackNumber: Int,
     @JsonProperty("type")              val type: String,
     @JsonProperty("uri")               val uri: String
 ): Encodable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SpotifyArtist (
     @JsonProperty("id")   val id: String,
     @JsonProperty("href") val href: String,
