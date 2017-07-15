@@ -1,6 +1,7 @@
 package it.introini.spotifyplshuffler.handlers
 
 import com.google.inject.Inject
+import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.Future
 import io.vertx.core.Handler
@@ -9,6 +10,7 @@ import io.vertx.ext.web.RoutingContext
 import it.introini.spotifyplshuffler.manager.token.Token
 import it.introini.spotifyplshuffler.manager.state.StateManager
 import it.introini.spotifyplshuffler.manager.token.TokenManager
+import it.introini.spotifyplshuffler.spotify.SpotifyAuthException
 import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import it.introini.spotifyplshuffler.spotify.SpotifyUser
 import org.pmw.tinylog.Logger
@@ -49,10 +51,18 @@ class LoginCBHandler @Inject constructor(val stateManager: StateManager,
                             if (it.succeeded()) {
                                 val spotifyUser = it.result()
                                 Logger.info(spotifyUser)
+                                tokenManager.updateTokenUser(userId, spotifyUser)
                                 response.end(JsonObject().put("userId", userId)
                                                          .put("spotify_user", JsonObject.mapFrom(spotifyUser)).encode())
                             } else {
-                                event.fail(it.cause())
+                                val cause = it.cause()
+                                if (cause is SpotifyAuthException) {
+                                    event.response().putHeader(HttpHeaderNames.CONTENT_TYPE, "application/json")
+                                    event.response().statusCode = HttpResponseStatus.UNAUTHORIZED.code()
+                                    event.response().end(JsonObject.mapFrom(cause).encode())
+                                } else {
+                                    event.fail(cause)
+                                }
                             }
                         }
                     } else {

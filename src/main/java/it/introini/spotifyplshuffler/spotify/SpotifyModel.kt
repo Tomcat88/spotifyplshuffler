@@ -51,10 +51,42 @@ data class PagingObject<out T> (
 )
 
 data class SpotifyPlaylistTrack (
-        @JsonProperty("added_at") val addedAt: Instant,
-        @JsonProperty("track")    val track: SpotifyTrack
+    @JsonProperty("added_at") val addedAt: Instant,
+    @JsonProperty("is_local") val isLocal: Boolean,
+    @JsonProperty("track")    val track: SpotifyTrack
 )
 
 data class SpotifyTrack (
-        val id: String
+    @JsonProperty("id")                val id: String,
+    @JsonProperty("name")              val name: String,
+    @JsonProperty("artists")           val artists: Collection<SpotifyArtist>,
+    @JsonProperty("available_markets") val availableMarkets: Collection<String>,
+    @JsonProperty("disc_number")       val discNumber: Int,
+    @JsonProperty("duration_ms")       val durationMs: Int,
+    @JsonProperty("explicit")          val explicit: Boolean,
+    @JsonProperty("href")              val href: String,
+    @JsonProperty("is_playable")       val isPlayable: Boolean,
+    @JsonProperty("popularity")        val popularity: Int,
+    @JsonProperty("preview_url")       val previewUrl: String,
+    @JsonProperty("track_number")      val trackNumber: Int,
+    @JsonProperty("type")              val type: String,
+    @JsonProperty("uri")               val uri: String
 )
+
+data class SpotifyArtist (
+    @JsonProperty("id")   val id: String,
+    @JsonProperty("href") val href: String,
+    @JsonProperty("name") val name: String,
+    @JsonProperty("type") val type: String,
+    @JsonProperty("uri")  val uri: String
+)
+
+// ==== ERRORS ====
+
+data class SpotifyApiException( @JsonProperty("error") val error: RegularErrorObject): RuntimeException()
+
+data class RegularErrorObject( @JsonProperty("status")  val status: Int,
+                               @JsonProperty("message") val message: String)
+
+data class SpotifyAuthException( @JsonProperty("error")             val error: String,
+                                 @JsonProperty("error_description") val errorDescription: String): RuntimeException()

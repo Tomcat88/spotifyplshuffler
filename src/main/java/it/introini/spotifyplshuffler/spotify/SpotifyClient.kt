@@ -27,6 +27,7 @@ class SpotifyClient @Inject constructor(val config: Config,
     val BASE_API_URL = "https://api.spotify.com/v1"
     val ME_URL       = "$BASE_API_URL/me"
     val ME_PLAYLISTS = "$BASE_API_URL/me/playlists"
+    val ME_PLAYLIST_TRACKS = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
 
     val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -48,7 +49,7 @@ class SpotifyClient @Inject constructor(val config: Config,
                 }
             } else {
                 it.bodyHandler {
-                    future.fail("Error while requesting tokens $it")
+                    future.fail(it.toJsonObject().mapTo(SpotifyAuthException::class.java))
                 }
             }
         }
@@ -72,6 +73,12 @@ class SpotifyClient @Inject constructor(val config: Config,
 
     fun getPlaylists(token: Token, future: Future<PagingObject<SpotifyPlaylist>>) {
         getRequest(ME_PLAYLISTS, token, future, object : TypeReference<PagingObject<SpotifyPlaylist>>() {})
+    }
+
+    fun getPlaylistTracks(token: Token, userId: String, playlist: String, future: Future<PagingObject<SpotifyPlaylistTrack>>) {
+        val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", userId)
+                                             .replace("{playlist_id}", playlist)
+        getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
     }
 
     // private utils
@@ -101,8 +108,7 @@ class SpotifyClient @Inject constructor(val config: Config,
                 }
             } else {
                 it.bodyHandler {
-                    //TODO Improve
-                    future.fail("Error while performing get request $url $it")
+                    future.fail(it.toJsonObject().mapTo(SpotifyApiException::class.java))
                 }
             }
         }
@@ -113,4 +119,6 @@ class SpotifyClient @Inject constructor(val config: Config,
         req.putHeader(HttpHeaders.AUTHORIZATION, auth)
         req.end()
     }
+
+
 }

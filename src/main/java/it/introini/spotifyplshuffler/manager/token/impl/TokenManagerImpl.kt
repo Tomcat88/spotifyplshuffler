@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters
 import io.vertx.core.json.JsonObject
 import it.introini.spotifyplshuffler.manager.token.Token
 import it.introini.spotifyplshuffler.manager.token.TokenManager
+import it.introini.spotifyplshuffler.spotify.SpotifyUser
 import org.bson.Document
 import java.time.Instant
 
@@ -27,5 +28,9 @@ class TokenManagerImpl @Inject constructor(mongoDatabase: MongoDatabase): TokenM
 
     override fun getToken(userId: String): Token? {
         return collection.find(Filters.eq("userId", userId)).limit(1).map { JsonObject(it.toMap()).mapTo(Token::class.java) }.firstOrNull()
+    }
+
+    override fun updateTokenUser(userId: String, spotifyUser: SpotifyUser) {
+
     }
 }
