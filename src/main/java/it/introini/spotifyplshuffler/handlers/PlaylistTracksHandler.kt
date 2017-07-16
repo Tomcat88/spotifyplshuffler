@@ -22,12 +22,13 @@ class PlaylistTracksHandler @Inject constructor(val spotifyClient: SpotifyClient
         val token = checkAuth(event)
         if (token != null) {
             val pl = event.pathParam("pl")
-            if (pl == null) {
+            val uid = event.pathParam("uid")
+            if (pl == null || uid == null) {
                 event.response().statusCode = HttpResponseStatus.BAD_REQUEST.code()
-                event.response().end(JsonObject().put("error", "pl is mandatory").encode())
+                event.response().end(JsonObject().put("error", "pl/uid is mandatory").encode())
             } else {
                 val future = Future.future<PagingObject<SpotifyPlaylistTrack>>()
-                spotifyClient.getPlaylistTracks(token, pl, future)
+                spotifyClient.getPlaylistTracks(token, uid, pl, future)
                 future.setHandler {
                     if (it.succeeded()) {
                         Logger.info(it.result())

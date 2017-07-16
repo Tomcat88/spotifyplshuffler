@@ -15,5 +15,5 @@ enum class Route(val method: HttpMethod, val endpoint: String, val handler: Clas
     LOGIN_CALLBACK (GET, "/logincb", LoginCBHandler::class.java),
 
     PLAYLISTS       (GET, "/playlists", PlaylistHandler::class.java),
-    PLAYLIST_TRACKS (GET, "/playlist/:pl/tracks", PlaylistTracksHandler::class.java)
+    PLAYLIST_TRACKS (GET, "/playlist/:uid/:pl/tracks", PlaylistTracksHandler::class.java)
 }

@@ -14,6 +14,7 @@ import io.vertx.core.json.JsonObject
 import it.introini.spotifyplshuffler.config.Config
 import it.introini.spotifyplshuffler.config.Parameter
 import it.introini.spotifyplshuffler.manager.token.Token
+import org.pmw.tinylog.Logger
 import java.net.URLEncoder
 import java.util.*
 
@@ -75,15 +76,10 @@ class SpotifyClient @Inject constructor(val config: Config,
         getRequest(ME_PLAYLISTS, token, future, object : TypeReference<PagingObject<SpotifyPlaylist>>() {})
     }
 
-    fun getPlaylistTracks(token: Token, playlist: String, future: Future<PagingObject<SpotifyPlaylistTrack>>) {
-        val spotifyUser = token.spotifyUser
-        if (spotifyUser == null) {
-            future.fail("Spotify user not found in token!")
-        } else {
-            val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", spotifyUser)
-                                                 .replace("{playlist_id}", playlist)
-            getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
-        }
+    fun getPlaylistTracks(token: Token, uid: String, playlist: String, future: Future<PagingObject<SpotifyPlaylistTrack>>) {
+        val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", uid)
+                                             .replace("{playlist_id}", playlist)
+        getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
     }
 
     // private utils
@@ -105,15 +101,24 @@ class SpotifyClient @Inject constructor(val config: Config,
         val req = httpClient.getAbs(url) {
             if (it.statusCode() == HttpResponseStatus.OK.code()) {
                 it.bodyHandler {
-                    if (typeReference == null) {
-                        future.complete(it.toJsonObject().mapTo(T::class.java))
-                    } else {
-                        future.complete(Json.mapper.convertValue(it.toJsonObject().map, typeReference))
+                    try {
+                        if (typeReference == null) {
+                            future.complete(it.toJsonObject().mapTo(T::class.java))
+                        } else {
+                            future.complete(Json.mapper.convertValue(it.toJsonObject().map, typeReference))
+                        }
+                    } catch (t: Throwable) {
+                        Logger.error(t, "Unknown exception")
+                        future.fail(INTERNAL_ERROR)
                     }
                 }
             } else {
                 it.bodyHandler {
-                    future.fail(it.toJsonObject().mapTo(SpotifyApiException::class.java))
+                    try {
+                        future.fail(it.toJsonObject().mapTo(SpotifyApiException::class.java))
+                    } catch (t: Throwable) {
+                        future.fail(t)
+                    }
                 }
             }
         }
