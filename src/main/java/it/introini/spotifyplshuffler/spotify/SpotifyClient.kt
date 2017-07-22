@@ -3,6 +3,7 @@ package it.introini.spotifyplshuffler.spotify
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpResponseStatus
+import io.netty.handler.codec.http.HttpResponseStatus.*
 import io.netty.handler.codec.http.QueryStringEncoder
 import io.vertx.core.Future
 import io.vertx.core.Vertx
@@ -30,6 +31,8 @@ class SpotifyClient @Inject constructor(val config: Config,
     val ME_PLAYLISTS = "$BASE_API_URL/me/playlists"
     val ME_PLAYLIST_TRACKS = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
 
+    val CREATE_PLAYLIST = "$BASE_API_URL/users/{user_id}/playlists"
+
     val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
     val httpClient: HttpClient = vertx.createHttpClient()
@@ -44,7 +47,7 @@ class SpotifyClient @Inject constructor(val config: Config,
     fun requestTokens(code: String, future: Future<JsonObject>) {
         val auth = getClientAuthorizationHeader()
         val request = httpClient.postAbs(TOKENS_URL) {
-            if (it.statusCode() == HttpResponseStatus.OK.code()) {
+            if (it.statusCode() == OK.code()) {
                 it.bodyHandler {
                     future.complete(it.toJsonObject())
                 }
@@ -82,6 +85,16 @@ class SpotifyClient @Inject constructor(val config: Config,
         getRequest(formattedUrl, token, future, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {})
     }
 
+    fun createPlaylist(token: Token, uid: String, name: String, public: Boolean?, collaborative: Boolean?, description: String?, future: Future<SpotifyPlaylistFull>) {
+        val data = JsonObject()
+        data.put("name", name)
+        data.put("public", public ?: false)
+        data.put("collaborative", collaborative ?: false)
+        data.put("description", description ?: name)
+        val formattedUrl = CREATE_PLAYLIST.replace("{user_id}", uid)
+        postRequest(formattedUrl, token, data, future)
+    }
+
     // private utils
 
     private fun getTokenAuthorizationHeader(accessToken: String): String {
@@ -98,8 +111,12 @@ class SpotifyClient @Inject constructor(val config: Config,
 
     inline private fun <reified T> getRequest(url: String, token: Token, future: Future<T>, typeReference: TypeReference<*>? = null) {
         val auth = getTokenAuthorizationHeader(token.accessToken)
+        Logger.info("Performing get request on endpoint $url")
         val req = httpClient.getAbs(url) {
-            if (it.statusCode() == HttpResponseStatus.OK.code()) {
+            Logger.info("Received response ${it.statusCode()}")
+            if (it.statusCode() == OK.code() ||
+                it.statusCode() == CREATED.code() ||
+                it.statusCode() == ACCEPTED.code()) {
                 it.bodyHandler {
                     try {
                         if (typeReference == null) {
@@ -128,6 +145,47 @@ class SpotifyClient @Inject constructor(val config: Config,
         req.setTimeout(5000L)
         req.putHeader(HttpHeaders.AUTHORIZATION, auth)
         req.end()
+    }
+
+    inline private fun <reified T> postRequest(url: String, token: Token, dataObject: JsonObject, future: Future<T>, typeReference: TypeReference<*>? = null) {
+        val auth = getTokenAuthorizationHeader(token.accessToken)
+        Logger.info("Performing post request on endpoint $url")
+        val req = httpClient.postAbs(url) {
+            Logger.info("Received response ${it.statusCode()}")
+            if (it.statusCode() == OK.code() ||
+                it.statusCode() == CREATED.code() ||
+                it.statusCode() == ACCEPTED.code()) {
+                it.bodyHandler {
+                    try {
+                        if (typeReference == null) {
+                            future.complete(it.toJsonObject().mapTo(T::class.java))
+                        } else {
+                            future.complete(Json.mapper.convertValue(it.toJsonObject().map, typeReference))
+                        }
+                    } catch (t: Throwable) {
+                        Logger.error(t, "Unknown exception")
+                        future.fail(INTERNAL_ERROR)
+                    }
+                }
+            } else {
+                it.bodyHandler {
+                    try {
+                        future.fail(it.toJsonObject().mapTo(SpotifyApiException::class.java))
+                    } catch (t: Throwable) {
+                        future.fail(t)
+                    }
+                }
+            }
+        }
+
+        req.exceptionHandler {
+            future.fail(it)
+        }
+        req.setTimeout(5000L)
+        req.putHeader(HttpHeaders.AUTHORIZATION, auth)
+        req.putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+        req.end(dataObject.encode())
+
     }
 
 
