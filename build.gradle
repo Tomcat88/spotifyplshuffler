@@ -18,11 +18,14 @@ apply plugin: 'kotlin'
 sourceCompatibility = 1.8
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile 'com.github.kittinunf.fuel:fuel:1.9.0'
+
     compile group: 'org.jsoup',                      name: 'jsoup',                   version: '1.10.1'
     compile group: 'io.vertx',                       name: 'vertx-core',              version: '3.4.0'
     compile group: 'io.vertx',                       name: 'vertx-web',               version: '3.4.0'

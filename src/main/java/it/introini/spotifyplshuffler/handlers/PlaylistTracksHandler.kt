@@ -27,13 +27,13 @@ class PlaylistTracksHandler @Inject constructor(val spotifyClient: SpotifyClient
                 event.response().statusCode = HttpResponseStatus.BAD_REQUEST.code()
                 event.response().end(JsonObject().put("error", "pl/uid is mandatory").encode())
             } else {
-                val future = Future.future<PagingObject<SpotifyPlaylistTrack>>()
+                val future = Future.future<Collection<SpotifyPlaylistTrack>>()
                 spotifyClient.getPlaylistTracks(token, uid, pl, future)
                 future.setHandler {
                     if (it.succeeded()) {
                         Logger.info(it.result())
                         event.response().putHeader(HttpHeaderNames.CONTENT_TYPE, "application/json")
-                        event.response().end(it.result().items.map { it.toJson() }.let { JsonArray(it) }.encode())
+                        event.response().end(it.result().map { it.toJson() }.let { JsonArray(it) }.encode())
                     } else {
                         val cause = it.cause()
                         if (cause is SpotifyApiException) {
