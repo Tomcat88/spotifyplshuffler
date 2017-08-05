@@ -66,6 +66,37 @@ data class SpotifyPlaylistFull (
     @JsonProperty("tracks")        val tracks: PagingObject<SpotifyPlaylistTrack>
 ): Encodable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+class PlaylistFull (
+    @JsonProperty("collaborative") collaborative: Boolean,
+    @JsonProperty("description")   description: String?,
+    @JsonProperty("owner")         owner: SpotifyPublicUser,
+    @JsonProperty("href")          href: String,
+    @JsonProperty("id")            id: String,
+    @JsonProperty("images")        spotifyImages: Collection<SpotifyImage>,
+    @JsonProperty("name")          name: String,
+    @JsonProperty("public")        public: Boolean?,
+    @JsonProperty("snapshot_id")   snapshotId: String,
+    @JsonProperty("type")          type: String,
+    @JsonProperty("uri")           uri: String,
+    @JsonProperty("tracks")        tracks: Collection<SpotifyPlaylistTrack>
+) {
+
+    val collaborative: Boolean                   = collaborative @JsonProperty("collaborative") get
+    val description: String?                     = description   @JsonProperty("description")   get
+    val owner: SpotifyPublicUser                 = owner         @JsonProperty("owner")         get
+    val href: String                             = href          @JsonProperty("href")          get
+    val id: String                               = id            @JsonProperty("id")            get
+    val spotifyImages: Collection<SpotifyImage>  = spotifyImages @JsonProperty("images")        get
+    val name: String                             = name          @JsonProperty("name")          get
+    val public: Boolean?                         = public        @JsonProperty("public")        get
+    val snapshotId: String                       = snapshotId    @JsonProperty("snapshot_id")   get
+    val type: String                             = type          @JsonProperty("type")          get
+    val uri: String                              = uri           @JsonProperty("uri")           get
+    val tracks: Collection<SpotifyPlaylistTrack> = tracks        @JsonProperty("tracks")        get
+
+}
+
 data class TracksObject (
     @JsonProperty("href")  val href: String,
     @JsonProperty("total") val total: Int

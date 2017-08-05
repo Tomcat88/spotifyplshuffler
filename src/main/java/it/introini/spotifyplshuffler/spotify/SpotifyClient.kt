@@ -30,6 +30,7 @@ class SpotifyClient @Inject constructor(val config: Config,
     val BASE_API_URL        = "https://api.spotify.com/v1"
     val ME_URL              = "$BASE_API_URL/me"
     val ME_PLAYLISTS        = "$BASE_API_URL/me/playlists"
+    val PLAYLIST            = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}"
     val ME_PLAYLIST_TRACKS  = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
     val CREATE_PLAYLIST     = "$BASE_API_URL/users/{user_id}/playlists"
 
@@ -80,6 +81,71 @@ class SpotifyClient @Inject constructor(val config: Config,
                 future.complete(data)
             }
         }
+    }
+
+    fun getPlaylist(token: Token, uid: String, pid: String): Future<PlaylistFull> {
+        val future = Future.future<PlaylistFull>()
+        val formattedUrl = PLAYLIST.replace("{user_id}", uid)
+                                   .replace("{playlist_id}", pid)
+        getRequest<SpotifyPlaylistFull>(formattedUrl, token).let {
+            (error, data) ->
+            if (error != null) {
+                future.fail(error)
+            } else if (data != null){
+                if (data.tracks.next == null) {
+                    future.complete(PlaylistFull(
+                            data.collaborative,
+                            data.description,
+                            data.owner,
+                            data.href,
+                            data.id,
+                            data.spotifyImages,
+                            data.name,
+                            data.public,
+                            data.snapshotId,
+                            data.type,
+                            data.uri,
+                            data.tracks.items
+                    ))
+                } else {
+                    val tracks = mutableListOf<SpotifyPlaylistTrack>()
+                    tracks.addAll(data.tracks.items)
+                    var exit = false
+                    var url = data.tracks.next
+                    while (!exit) {
+                        getRequest<PagingObject<SpotifyPlaylistTrack>>(url!!, token, object : TypeReference<PagingObject<SpotifyPlaylistTrack>>() {}).let {
+                            (error, trackData) ->
+                                if (error != null) {
+                                    future.fail(error)
+                                    exit = true
+                                } else {
+                                    tracks.addAll(trackData?.items ?: emptyList())
+                                    if (trackData?.next == null) {
+                                        future.complete(PlaylistFull(
+                                                data.collaborative,
+                                                data.description,
+                                                data.owner,
+                                                data.href,
+                                                data.id,
+                                                data.spotifyImages,
+                                                data.name,
+                                                data.public,
+                                                data.snapshotId,
+                                                data.type,
+                                                data.uri,
+                                                tracks
+                                        ))
+                                        exit = true
+                                    } else {
+                                        url = trackData.next
+                                    }
+                                }
+                        }
+                    }
+                }
+            }
+        }
+        return future
     }
 
     fun getPlaylists(token: Token, future: Future<PagingObject<SpotifyPlaylist>>) {
@@ -177,7 +243,7 @@ class SpotifyClient @Inject constructor(val config: Config,
         result.let { (data, error) ->
             if (error != null) {
                 try {
-                    return Pair(error.errorData.toString().let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
+                    return Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
                 } catch (t: Throwable) {
                     return Pair(t, null)
                 }
@@ -206,7 +272,7 @@ class SpotifyClient @Inject constructor(val config: Config,
         result.let { (data, error) ->
             if (error != null) {
                 try {
-                    return Pair(error.errorData.toString().let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
+                    return Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
                 } catch (t: Throwable) {
                     return Pair(t, null)
                 }
