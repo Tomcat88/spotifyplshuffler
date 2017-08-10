@@ -188,12 +188,13 @@ class SpotifyClient @Inject constructor(val config: Config,
         }
     }
 
-    fun createPlaylist(token: Token, uid: String, name: String, public: Boolean?, collaborative: Boolean?, description: String?, future: Future<SpotifyPlaylistFull>) {
+    fun createPlaylist(token: Token, uid: String, name: String, public: Boolean = false, collaborative: Boolean = false, description: String = ""): Future<SpotifyPlaylistFull> {
+        val future = Future.future<SpotifyPlaylistFull>()
         val data = JsonObject()
         data.put("name", name)
-        data.put("public", public ?: false)
-        data.put("collaborative", collaborative ?: false)
-        data.put("description", description ?: name)
+        data.put("public", public)
+        data.put("collaborative", collaborative)
+        data.put("description", description)
         val formattedUrl = CREATE_PLAYLIST.replace("{user_id}", uid)
         postRequest<SpotifyPlaylistFull>(formattedUrl, token, data).let {
             (error, data) ->
@@ -203,9 +204,11 @@ class SpotifyClient @Inject constructor(val config: Config,
                 future.complete(data)
             }
         }
+        return future
     }
 
-    fun addTracks(token: Token, uid: String, pid: String, trackIds: Collection<String>, future: Future<JsonObject>) {
+    fun addTracks(token: Token, uid: String, pid: String, trackIds: Collection<String>): Future<JsonObject> {
+        val future = Future.future<JsonObject>()
         val data = JsonObject()
         data.put("uris", trackIds.toList().let { JsonArray(it) })
         val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", uid)
@@ -219,6 +222,7 @@ class SpotifyClient @Inject constructor(val config: Config,
                 future.complete(data)
             }
         }
+        return future
     }
 
     // private utils
