@@ -7,7 +7,6 @@ import io.vertx.core.Future
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-import it.introini.spotifyplshuffler.manager.token.Token
 import it.introini.spotifyplshuffler.manager.state.StateManager
 import it.introini.spotifyplshuffler.manager.token.TokenManager
 import it.introini.spotifyplshuffler.spotify.SpotifyAuthException

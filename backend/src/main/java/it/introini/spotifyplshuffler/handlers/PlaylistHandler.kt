@@ -3,12 +3,10 @@ package it.introini.spotifyplshuffler.handlers
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import it.introini.spotifyplshuffler.manager.token.TokenManager
 import it.introini.spotifyplshuffler.routes.AbstractHandler
-import it.introini.spotifyplshuffler.spotify.PlaylistFull
 import it.introini.spotifyplshuffler.spotify.SpotifyApiException
 import it.introini.spotifyplshuffler.spotify.SpotifyClient
 

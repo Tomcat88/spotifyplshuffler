@@ -20,5 +20,5 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 .vertx
-/src/test/resources/
+/backend/src/test/resources/
 *.iml

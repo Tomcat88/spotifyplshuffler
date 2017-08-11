@@ -3,7 +3,6 @@ package it.introini.spotifyplshuffler.manager.token
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import it.introini.spotifyplshuffler.spotify.Encodable
-import it.introini.spotifyplshuffler.spotify.SpotifyUser
 import java.time.Instant
 
 

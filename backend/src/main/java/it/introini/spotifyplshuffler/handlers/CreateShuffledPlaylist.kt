@@ -2,7 +2,6 @@ package it.introini.spotifyplshuffler.handlers
 
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import it.introini.spotifyplshuffler.manager.token.TokenManager
