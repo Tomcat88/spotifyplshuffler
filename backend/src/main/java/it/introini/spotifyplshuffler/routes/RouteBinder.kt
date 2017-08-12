@@ -8,6 +8,7 @@ import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CookieHandler
 import io.vertx.ext.web.handler.LoggerHandler
 import it.introini.spotifyplshuffler.config.Config
+import it.introini.spotifyplshuffler.handlers.ApplicationPageHandler
 import org.pmw.tinylog.Logger
 
 
@@ -22,6 +23,7 @@ class RouteBinder @Inject constructor(val injector: Injector,
         router.route("$API_ROOT/*").handler(BodyHandler.create())
         router.route("$API_ROOT/*").handler(LoggerHandler.create())
         router.route("$API_ROOT/*").handler(CookieHandler.create())
+        router.get("/shuffler").handler(ApplicationPageHandler)
         routes.forEach {
             router.route(it.method, "$API_ROOT${it.endpoint}").blockingHandler(injector.getInstance(it.handler))
         }

@@ -9,6 +9,7 @@ import it.introini.spotifyplshuffler.handlers.*
 
 
 enum class Route(val method: HttpMethod, val endpoint: String, val handler: Class<out Handler<RoutingContext>>) {
+
     LOGIN          (GET, "/login",   LoginHandler::class.java),
     LOGIN_CALLBACK (GET, "/logincb", LoginCBHandler::class.java),
 

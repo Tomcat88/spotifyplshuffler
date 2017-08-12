@@ -15,7 +15,7 @@ dependencies {
 }
 
 kotlinFrontend {
-    sourceMaps = true
+    sourceMaps = false
 
     npm {
         replaceVersion("kotlinx-html-js", "1.1.0")
@@ -25,19 +25,20 @@ kotlinFrontend {
         dependency("react")
         dependency("react-dom")
         dependency("react-router")
+        dependency("react-tap-event-plugin")
         dependency("jquery")
         dependency("react-markdown")
+        dependency("material-ui")
 
         devDependency("css-loader")
         devDependency("style-loader")
         devDependency("babel-loader")
         devDependency("babel-core")
-        devDependency("karma")
     }
 
     webpackBundle {
         publicPath = "/frontend/"
-        port = 8080
+        port = 8083
         proxyUrl = "http://localhost:9090"
     }
 }
@@ -54,8 +55,6 @@ sourceSets {
     main.kotlin.srcDirs += "src"
     main.resources.srcDirs += "resources"
     main.output.resourcesDir = "build/js/resources"
-    test.kotlin.srcDirs += "test"
-    test.resources.srcDirs += "testResources"
 }
 
 task copyResources(type: Copy) {
