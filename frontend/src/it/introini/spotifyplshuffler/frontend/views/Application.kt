@@ -1,8 +1,7 @@
-package it.introini.spotifyplshuffler.frontend
+package it.introini.spotifyplshuffler.frontend.views
 
+import it.introini.jscookie.Cookies
 import kotlinx.html.div
-import kotlinx.html.h1
-import kotlinx.html.js.onClickFunction
 import react.RState
 import react.ReactComponentEmptyProps
 import react.ReactComponentSpec
@@ -10,7 +9,6 @@ import react.dom.ReactDOM
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.dom.render
-import react.materialui.MaterialUiButton
 import react.materialui.MaterialUiMuiThemeProvider
 import kotlin.browser.document
 
@@ -32,30 +30,36 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
     companion object : ReactComponentSpec<Application, ReactComponentEmptyProps, ApplicationState>
 
     init {
-        state = ApplicationState(MainView.Login)
+        val userId = Cookies.get("userId")
+        console.log(userId)
+        state = ApplicationState(getFirstView(userId), userId)
     }
 
     override fun ReactDOMBuilder.render() {
         div("content") {
-            MaterialUiButton {
-                primary = true
-                children = "Ciao"
-                onClickFunction = {
-                    setState {
-                        text = "Thomas"
+            when (state.view) {
+                MainView.Login -> div {
+                    LoginView {}
+                }
+                MainView.Home -> div {
+                    HomeView {
+                        userId = state.userId!!
                     }
                 }
             }
-            when (state.view) {
-                MainView.Login -> h1 { +"Ciao a ${state.text}" }
-            }
         }
+    }
+
+    private fun getFirstView(userId: String?): MainView {
+        if (userId != null) return MainView.Home
+        else                return MainView.Login
     }
 }
 
 enum class MainView {
-    Login
-
+    Login,
+    Home
 }
 
-class ApplicationState(val view: MainView, var text: String = "Nessuno"): RState
+class ApplicationState(var view: MainView,
+                       var userId: String? = null): RState

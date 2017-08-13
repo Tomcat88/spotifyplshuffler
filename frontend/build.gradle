@@ -29,6 +29,7 @@ kotlinFrontend {
         dependency("jquery")
         dependency("react-markdown")
         dependency("material-ui")
+        dependency("js-cookie")
 
         devDependency("css-loader")
         devDependency("style-loader")

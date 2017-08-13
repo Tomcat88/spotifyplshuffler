@@ -3,10 +3,13 @@ package it.introini.spotifyplshuffler.routes
 import com.google.inject.Inject
 import com.google.inject.Injector
 import io.netty.handler.codec.http.HttpResponseStatus
+import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CookieHandler
 import io.vertx.ext.web.handler.LoggerHandler
+import io.vertx.ext.web.handler.SessionHandler
+import io.vertx.ext.web.sstore.LocalSessionStore
 import it.introini.spotifyplshuffler.config.Config
 import it.introini.spotifyplshuffler.handlers.ApplicationPageHandler
 import org.pmw.tinylog.Logger
@@ -14,12 +17,14 @@ import org.pmw.tinylog.Logger
 
 class RouteBinder @Inject constructor(val injector: Injector,
                                       val router: Router,
+                                      val vertx: Vertx,
                                       val config: Config) {
 
     val API_ROOT = "/shuffler/api/v1"
 
     fun bindRoutes() {
         val routes = Route.values()
+        //router.route("$API_ROOT/*").handler(SessionHandler.create(LocalSessionStore.create(vertx)))
         router.route("$API_ROOT/*").handler(BodyHandler.create())
         router.route("$API_ROOT/*").handler(LoggerHandler.create())
         router.route("$API_ROOT/*").handler(CookieHandler.create())

@@ -1,11 +1,13 @@
 package it.introini.spotifyplshuffler.handlers
 
+import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.Future
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.Cookie
 import io.vertx.ext.web.RoutingContext
 import it.introini.spotifyplshuffler.manager.state.StateManager
 import it.introini.spotifyplshuffler.manager.token.TokenManager
@@ -51,8 +53,12 @@ class LoginCBHandler @Inject constructor(val stateManager: StateManager,
                                 val spotifyUser = it.result()
                                 Logger.info(spotifyUser)
                                 tokenManager.updateTokenUser(userId, spotifyUser)
-                                response.end(JsonObject().put("userId", userId)
-                                                         .put("spotify_user", JsonObject.mapFrom(spotifyUser)).encode())
+                                event.addCookie(Cookie.cookie("userId", userId).setPath("/shuffler"))
+                                response.putHeader(HttpHeaderNames.LOCATION, "/shuffler")
+                                response.statusCode = HttpResponseStatus.FOUND.code()
+                                response.end()
+                                //response.end(JsonObject().put("userId", userId)
+                                //                         .put("spotify_user", JsonObject.mapFrom(spotifyUser)).encode())
                             } else {
                                 val cause = it.cause()
                                 if (cause is SpotifyAuthException) {
