@@ -56,3 +56,36 @@ data class TracksObject (
     val total: Int
 )
 
+data class SpotifyPlaylistTrack (
+    val addedAt: Long,
+    val isLocal: Boolean,
+    val track: SpotifyTrack
+)
+
+data class SpotifyTrack (
+    val id: String?,
+    val name: String,
+    val artists: Collection<SpotifyArtist>,
+    val availableMarkets: Collection<String>,
+    val discNumber: Int,
+    val durationMs: Int,
+    val explicit: Boolean,
+    val href: String?,
+    val isPlayable: Boolean,
+    val popularity: Int,
+    val previewUrl: String?,
+    val trackNumber: Int,
+    val type: String,
+    val uri: String
+)
+
+data class SpotifyArtist (
+    val id: String?,
+    val href: String?,
+    val name: String?,
+    val type: String?,
+    val uri: String?
+)
+
+
+

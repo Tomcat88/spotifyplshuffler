@@ -40,9 +40,10 @@ open class ReactBuilder {
     fun exitCurrentNode() : ReactElement {
         val node = path.removeAt(path.lastIndex)
         val element = node.create()
-        if (path.isNotEmpty()) {
+        if (path.isNotEmpty() && !(node.props.key?.contains("delay") ?: false)) {
             children.add(element)
         }
+        node.props.key = node.props.key?.replace("delay","")
         lastLeaved = element
         return element
     }

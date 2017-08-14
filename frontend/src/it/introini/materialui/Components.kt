@@ -42,5 +42,12 @@ object Subheader: ReactExternalComponentSpec<RProps>(MaterialUi.Subheader)
 private val MaterialUiList: dynamic = runtime.wrappers.require("material-ui/List")
 class  ListProps: BaseMUIProps()
 object List: ReactExternalComponentSpec<ListProps>(MaterialUiList.List)
-class  ListItemProps(var primaryText: String? = null): BaseMUIProps()
+class  ListItemProps(var leftAvatar: Any? = null,
+                     var primaryText: String? = null,
+                     var secondaryText: String? = null,
+                     var onClick: (Event) -> Unit): BaseMUIProps()
 object ListItem: ReactExternalComponentSpec<ListItemProps>(MaterialUiList.ListItem)
+
+class AvatarProps(var src: String? = null,
+                  var size: Int? = null): BaseMUIProps()
+object Avatar: ReactExternalComponentSpec<AvatarProps>(MaterialUi.Avatar)

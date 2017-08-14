@@ -24,6 +24,55 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun getPlaylistTracks(userId: String, pl: String, uid: String): Collection<SpotifyPlaylistTrack> {
+        val auth = getAuthHeader(userId)
+        return async {
+            getAndParseResult("$BASE_API/playlist/$uid/$pl/tracks", auth, null, this::parseSpotifyPlaylistTracks)
+        }.await()
+    }
+
+    private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {
+        val array = json as Array<dynamic>
+        return array.map { t ->
+            SpotifyPlaylistTrack(
+                    t.addedAt,
+                    t.isLocal,
+                    parseSpotifyTrack(t.track)
+            )
+        }
+    }
+
+    private fun parseSpotifyTrack(json: dynamic): SpotifyTrack {
+        val artists = json.artists as Array<dynamic>
+        val markets = json.availableMarkets as Array<dynamic>
+        return SpotifyTrack(
+                json.id,
+                json.name,
+                artists.map(this::parseSpotifyArtist),
+                markets.map(Any::toString),
+                json.discNumber,
+                json.durationMs,
+                json.explicit,
+                json.href,
+                json.isPlayable,
+                json.popularity,
+                json.previewUrl,
+                json.trackNumber,
+                json.type,
+                json.uri
+        )
+    }
+
+    private fun parseSpotifyArtist(json: dynamic): SpotifyArtist {
+        return SpotifyArtist(
+                json.id,
+                json.href,
+                json.name,
+                json.type,
+                json.uri
+        )
+    }
+
     private fun parseSpotifyPublicUser(json: dynamic): SpotifyPublicUser {
         val images = json.spotifyImages as Array<dynamic>?
         return SpotifyPublicUser(

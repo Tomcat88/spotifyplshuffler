@@ -2,15 +2,25 @@
     margin: 0px
 }
 
+body {
+    height: 100%;
+}
+
 .pl-body {
+    height: 91%;
     display: flex;
     flex-wrap: wrap;
 }
 
 .pl-list {
     width: 40%;
-    overflow: hidden;
+    overflow: auto;
 }
 .pl-tracks {
-    width: 60%
+    width: 60%;
+    overflow: auto;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
