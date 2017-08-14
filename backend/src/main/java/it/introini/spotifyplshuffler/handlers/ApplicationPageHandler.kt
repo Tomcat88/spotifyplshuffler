@@ -16,7 +16,7 @@ open class ApplicationPageHandler: Handler<RoutingContext> {
             head {
                 link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Roboto:300,400,500")
             }
-            body {
+            body(classes = "no-margin") {
                 div { id = "app" }
                 script(src = "http://localhost:8083/frontend/frontend.bundle.js")
             }

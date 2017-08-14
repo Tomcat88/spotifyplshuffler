@@ -1,0 +1,16 @@
+.no-margin {
+    margin: 0px
+}
+
+.pl-body {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.pl-list {
+    width: 40%;
+    overflow: hidden;
+}
+.pl-tracks {
+    width: 60%
+}

@@ -32,7 +32,7 @@ open class ReactBuilder {
 
     fun <T: Node<*>> enterNode(node: T) {
         if (path.isEmpty() && lastLeaved != null) {
-            console.error("React only allows single element be returned from render() function")
+            //console.error("React only allows single element be returned from render() function")
         }
         path.add(node)
     }

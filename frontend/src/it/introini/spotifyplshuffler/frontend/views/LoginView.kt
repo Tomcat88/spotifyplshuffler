@@ -6,6 +6,7 @@ import kotlinx.html.js.onClickFunction
 import react.RProps
 import react.RState
 import react.ReactComponentSpec
+import react.ReactElement
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.materialui.RaisedButton

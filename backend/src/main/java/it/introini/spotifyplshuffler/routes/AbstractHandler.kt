@@ -13,7 +13,7 @@ abstract class AbstractHandler constructor(protected val tokenManager: TokenMana
     fun checkAuth(event: RoutingContext): Token? {
         val auth = event.request().getHeader(HttpHeaderNames.AUTHORIZATION)?.removePrefix("Basic ")
         val token = auth?.let {
-            String(Base64.getDecoder().decode(it)).split(":").component2()
+            String(Base64.getDecoder().decode(it)).split(":").component1()
         }?.let {
             tokenManager.getToken(it)
         }

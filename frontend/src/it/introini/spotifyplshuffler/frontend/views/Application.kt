@@ -5,6 +5,7 @@ import kotlinx.html.div
 import react.RState
 import react.ReactComponentEmptyProps
 import react.ReactComponentSpec
+import react.ReactElement
 import react.dom.ReactDOM
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
@@ -44,9 +45,18 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
                 MainView.Home -> div {
                     HomeView {
                         userId = state.userId!!
+                        onLogout = { logout() }
                     }
                 }
             }
+        }
+    }
+
+    fun logout() {
+        Cookies.remove("userId")
+        setState {
+            userId = null
+            view = MainView.Login
         }
     }
 
