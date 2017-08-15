@@ -14,7 +14,6 @@ import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.materialui.*
 import runtime.wrappers.msToHMS
-import kotlin.js.Date
 
 
 class HomeViewProps(var userId: String,
@@ -37,14 +36,16 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
     }
 
     private fun onPlSelected(pl: SpotifyPlaylist) {
-        setState {
-            selectedPlaylist = pl
-            selectedTracks = null
-        }
-        launch {
-            val tracks = ShufflerClient.getPlaylistTracks(props.userId, pl.id, pl.owner.id)
+        if (pl.id != state.selectedPlaylist?.id) {
             setState {
-                selectedTracks = tracks
+                selectedPlaylist = pl
+                selectedTracks = null
+            }
+            launch {
+                val tracks = ShufflerClient.getPlaylistTracks(props.userId, pl.id, pl.owner.id)
+                setState {
+                    selectedTracks = tracks
+                }
             }
         }
     }
@@ -68,6 +69,21 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
                         Subheader { +"Playlists" }
                         state.playlists.map { pl ->
                         ListItem {
+                            rightIconButton = IconMenu {
+                                key = "delay"
+                                iconButtonElement = IconButton {
+                                    key = "delay"
+                                    tooltip = "options"
+                                    tooltipPosition = "bottom-left"
+                                    MoreVertIcon { color = "grey" }
+                                }
+                                MenuItem {
+                                    +"Shuffle"
+                                }
+                                MenuItem {
+                                    +"Delete"
+                                }
+                            }
                             leftAvatar = pl.spotifyImages.firstOrNull()?.url?.let { Avatar {
                                 key = "delay"
                                 src = it
@@ -81,7 +97,7 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
                         }
                     }
                 } else {
-                    i { +"Nessuna playlist trovata" }
+                    i { +"No playlists found" }
                 }
                 if (state.selectedPlaylist != null) List {
                     className = "pl-tracks"
@@ -94,10 +110,10 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
                             }
                         }
                     } else {
-                        span { +"Caricando..." }
+                        span { +"Loading..." }
                     }
                 } else {
-                    i { +"Seleziona una playlists per vederne le tracce" }
+                    i { +"Select a playlist to see its tracks" }
                 }
             }
         }

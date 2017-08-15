@@ -89,6 +89,7 @@ open class ShufflerClient {
     }
 
     private fun parseSpotifyPlaylist(json: dynamic): SpotifyPlaylist {
+        console.log(json)
         val images = json.spotifyImages as Array<SpotifyImage>
         return SpotifyPlaylist(
                 json.collaborative,

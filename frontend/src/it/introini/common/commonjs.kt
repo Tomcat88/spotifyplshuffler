@@ -36,5 +36,5 @@ fun msToHMS(ms: Int): String {
     val minutes = seconds / 60 // 60 seconds in 1 minute
     // 4- Keep only seconds not extracted to minutes:
     seconds %= 60
-    return "$minutes:$seconds"
+    return "$minutes:${if (seconds < 10) "0${seconds}" else seconds}"
 }
