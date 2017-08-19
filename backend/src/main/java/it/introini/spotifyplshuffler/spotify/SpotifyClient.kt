@@ -19,6 +19,7 @@ import it.introini.spotifyplshuffler.manager.token.Token
 import org.pmw.tinylog.Logger
 import java.net.URLEncoder
 import java.util.*
+import kotlin.reflect.KClass
 
 
 class SpotifyClient @Inject constructor(val config: Config,
@@ -239,7 +240,7 @@ class SpotifyClient @Inject constructor(val config: Config,
         val data = JsonObject()
         data.put("uris", trackIds.toList().let { JsonArray(it) })
         val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", uid)
-                                             .replace("{playlist_id", pid)
+                                             .replace("{playlist_id}", pid)
 
         postRequest<JsonObject>(formattedUrl, token, data).let {
             (error, data) ->
@@ -310,7 +311,7 @@ class SpotifyClient @Inject constructor(val config: Config,
             } else if (data != null) {
                 try {
                     if (typeReference == null) {
-                        return Pair(null, data.let { JsonObject(it) }.mapTo(T::class.java))
+                        return Pair(null, data.let { JsonObject(it) }.let {  if (T::class != JsonObject::class) it.mapTo(T::class.java) else T::class.java.cast(it) })
                     } else {
                         return Pair(null, Json.mapper.convertValue(data.let { JsonObject(it).map }, typeReference))
                     }

@@ -27,6 +27,10 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
 
     init {
         state = HomeViewState()
+        refreshPlaylists()
+    }
+
+    private fun refreshPlaylists() {
         launch {
             val playlist = ShufflerClient.getPlaylist(props.userId)
             setState {
@@ -51,7 +55,13 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
     }
 
     private fun onShuffle(pl: SpotifyPlaylist) {
-        console.log("Shuffle", pl)
+        launch {
+            if (ShufflerClient.shufflePlaylist(props.userId, pl.id, pl.owner.id)) {
+                refreshPlaylists()
+            } else {
+                console.error("Could not shuffle playlist")
+            }
+        }
     }
 
 

@@ -1,11 +1,13 @@
 package it.introini.spotifyplshuffler.handlers
 
 import com.google.inject.Inject
+import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import it.introini.spotifyplshuffler.manager.token.TokenManager
 import it.introini.spotifyplshuffler.routes.AbstractHandler
+import it.introini.spotifyplshuffler.spotify.SpotifyApiException
 import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import java.util.*
 
@@ -28,13 +30,21 @@ class CreateShuffledPlaylist @Inject constructor(spotifyClient: SpotifyClient,
                     spotifyClient.createPlaylist(token, token.spotifyUser!!, "${playlist.name} (Shuffled)").compose { newPlaylist ->
                         val tracks = playlist.tracks.map { it.track.uri }.toMutableList()
                         Collections.shuffle(tracks)
-                        spotifyClient.addTracks(token, uid, newPlaylist.id, tracks)
+                        spotifyClient.addTracks(token, token.spotifyUser!!, newPlaylist.id, tracks)
                     }
                 }.setHandler {
                     if (it.succeeded()) {
-                        //TODO decide what to return
+                        event.response().putHeader(HttpHeaderNames.CONTENT_TYPE, "application/json")
+                        event.response().end(it.result().encode())
                     } else {
-                        
+                        val cause = it.cause()
+                        if (cause is SpotifyApiException) {
+                            event.response().putHeader(HttpHeaderNames.CONTENT_TYPE, "application/json")
+                            event.response().statusCode = cause.error.status
+                            event.response().end(JsonObject.mapFrom(cause.error).encode())
+                        } else {
+                            event.fail(cause)
+                        }
                     }
                 }
             }

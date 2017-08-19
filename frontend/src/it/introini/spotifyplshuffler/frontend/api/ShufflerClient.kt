@@ -31,6 +31,13 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun shufflePlaylist(userId: String, pl: String, uid: String): Boolean {
+        val auth = getAuthHeader(userId)
+        return async {
+            postAndParseResult("$BASE_API/playlist/$uid/$pl/shuffle", auth, null, { it.snapshot_id != null })
+        }.await()
+    }
+
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {
         val array = json as Array<dynamic>
         return array.map { t ->
@@ -130,6 +137,9 @@ fun getAuthHeader(userId: String): Pair<String, String> {
 
 suspend fun <T> getAndParseResult(url: String, auth: Pair<String, String>, body: dynamic, parse: (dynamic) -> T): T =
         requestAndParseResult("GET", url, auth, body, parse)
+
+suspend fun <T> postAndParseResult(url: String, auth: Pair<String, String>, body: dynamic, parse: (dynamic) -> T): T =
+        requestAndParseResult("POST", url, auth, body, parse)
 
 suspend fun <T> requestAndParseResult(method: String, url: String, auth: Pair<String, String>, body: dynamic, parse: (dynamic) -> T): T {
     val headers = arrayOf(
