@@ -15,7 +15,7 @@ import org.pmw.tinylog.Logger
 
 
 class CreatePlaylistHandler @Inject constructor(tokenManager: TokenManager,
-                                                val spotifyClient: SpotifyClient): AbstractHandler(tokenManager) {
+                                                spotifyClient: SpotifyClient): AbstractHandler(tokenManager, spotifyClient) {
     override fun handle(event: RoutingContext) {
         val token = checkAuth(event)
         if (token != null) {

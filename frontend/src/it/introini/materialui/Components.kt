@@ -19,7 +19,7 @@ open class BaseMUIProps(var id: String? = null,
                         var name: String? = null,
                         var className: String? = null): RProps()
 
-class MenuItemProps: BaseMUIProps()
+class MenuItemProps(var onClick: (Event) -> Unit): BaseMUIProps()
 object MenuItem: ReactExternalComponentSpec<MenuItemProps>(MaterialUi.MenuItem)
 
 class IconMenuProps(var iconButtonElement: Any? = null): BaseMUIProps()

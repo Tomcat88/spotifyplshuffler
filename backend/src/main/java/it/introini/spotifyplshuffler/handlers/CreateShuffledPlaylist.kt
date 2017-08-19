@@ -10,8 +10,8 @@ import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import java.util.*
 
 
-class CreateShuffledPlaylist @Inject constructor(val spotifyClient: SpotifyClient,
-                                                     tokenManager: TokenManager): AbstractHandler(tokenManager) {
+class CreateShuffledPlaylist @Inject constructor(spotifyClient: SpotifyClient,
+                                                 tokenManager: TokenManager): AbstractHandler(tokenManager, spotifyClient) {
     override fun handle(event: RoutingContext) {
         val token = checkAuth(event)
         if (token != null) {

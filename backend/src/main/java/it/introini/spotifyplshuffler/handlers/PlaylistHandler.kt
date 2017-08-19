@@ -11,8 +11,8 @@ import it.introini.spotifyplshuffler.spotify.SpotifyApiException
 import it.introini.spotifyplshuffler.spotify.SpotifyClient
 
 
-class PlaylistHandler @Inject constructor(val spotifyClient: SpotifyClient,
-                                              tokenManager: TokenManager): AbstractHandler(tokenManager) {
+class PlaylistHandler @Inject constructor(spotifyClient: SpotifyClient,
+                                          tokenManager: TokenManager): AbstractHandler(tokenManager, spotifyClient) {
     override fun handle(event: RoutingContext) {
         val token = checkAuth(event)
         if (token != null) {

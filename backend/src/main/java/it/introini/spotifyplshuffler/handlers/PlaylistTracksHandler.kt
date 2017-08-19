@@ -14,8 +14,8 @@ import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import it.introini.spotifyplshuffler.spotify.SpotifyPlaylistTrack
 import org.pmw.tinylog.Logger
 
-class PlaylistTracksHandler @Inject constructor(val spotifyClient: SpotifyClient,
-                                                    tokenManager: TokenManager) : AbstractHandler(tokenManager) {
+class PlaylistTracksHandler @Inject constructor(spotifyClient: SpotifyClient,
+                                                tokenManager: TokenManager) : AbstractHandler(tokenManager, spotifyClient) {
 
     override fun handle(event: RoutingContext) {
         val token = checkAuth(event)

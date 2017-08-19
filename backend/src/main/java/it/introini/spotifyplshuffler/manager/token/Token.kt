@@ -25,4 +25,6 @@ class Token(@JsonProperty("token_type")    tokenType: String,
     val spotifyUser:  String?  = null         @JsonProperty("spotify_user")  get
     
     val expireTime:   Instant      = createdOn.plusSeconds(expiresIn)
+
+    fun isExpired(now: Instant) = now.isAfter(expireTime) || now == expireTime
 }

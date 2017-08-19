@@ -50,6 +50,11 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
         }
     }
 
+    private fun onShuffle(pl: SpotifyPlaylist) {
+        console.log("Shuffle", pl)
+    }
+
+
     override fun ReactDOMBuilder.render() {
         val logoutBt = FlatButton {
             label = "logout"
@@ -79,9 +84,7 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
                                 }
                                 MenuItem {
                                     +"Shuffle"
-                                }
-                                MenuItem {
-                                    +"Delete"
+                                    onClick = { onShuffle(pl) }
                                 }
                             }
                             leftAvatar = pl.spotifyImages.firstOrNull()?.url?.let { Avatar {

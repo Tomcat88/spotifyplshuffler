@@ -72,6 +72,33 @@ class SpotifyClient @Inject constructor(val config: Config,
         request.end(Buffer.buffer(body))
     }
 
+    fun refreshToken(token: Token): Pair<Throwable?, JsonObject?> {
+        val auth = getClientAuthorizationHeader()
+        val encoder = QueryStringEncoder("")
+        encoder.addParam("grant_type", "authorization_code")
+        encoder.addParam("redirect_uri", redirectUri)
+        encoder.addParam("code", token.refreshToken)
+        val body = encoder.toString().substring(1) // Strips '?'
+        val (_, response, result) = Fuel.post(TOKENS_URL).header(HttpHeaders.AUTHORIZATION.toString() to auth,
+                                                                 HttpHeaders.CONTENT_TYPE.toString() to "application/x-www-form-urlencoded")
+                                                                 .body(body)
+                                                                 .timeout(5000)
+                                                                 .responseString()
+        result.let { (data, error) ->
+            if (error != null) {
+                try {
+                    return Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
+                } catch (t: Throwable) {
+                    return Pair(t, null)
+                }
+            } else if (data != null) {
+                return Pair(null, data.let { JsonObject(it) })
+            } else {
+                return Pair(IllegalStateException("data and error both null"), null)
+            }
+        }
+    }
+
     fun getMe(token: Token, future: Future<SpotifyUser>) {
         getRequest<SpotifyUser>(ME_URL, token).let {
             (error, data) ->
