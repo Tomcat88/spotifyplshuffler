@@ -16,8 +16,7 @@ import react.materialui.*
 import runtime.wrappers.msToHMS
 
 
-class HomeViewProps(var userId: String,
-                    var onLogout: () -> Unit): RProps()
+class HomeViewProps(var userId: String): RProps()
 class HomeViewState(var playlists: Collection<SpotifyPlaylist> = emptyList(),
                     var selectedPlaylist: SpotifyPlaylist? = null,
                     var selectedTracks: Collection<SpotifyPlaylistTrack>? = null): RState
@@ -66,70 +65,57 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
 
 
     override fun ReactDOMBuilder.render() {
-        val logoutBt = FlatButton {
-            label = "logout"
-            onClick = {
-                props.onLogout()
+        div("pl-body") {
+            if (state.playlists.isNotEmpty()) List {
+                className = "pl-list"
+                children =
+                    Subheader { +"Playlists" }
+                    state.playlists.map { pl ->
+                    ListItem {
+                        rightIconButton = IconMenu {
+                            key = "delay"
+                            iconButtonElement = IconButton {
+                                key = "delay"
+                                tooltip = "options"
+                                tooltipPosition = "bottom-left"
+                                MoreVertIcon { color = "grey" }
+                            }
+                            MenuItem {
+                                +"Shuffle"
+                                onClick = { onShuffle(pl) }
+                            }
+                        }
+                        leftAvatar = pl.spotifyImages.firstOrNull()?.url?.let { Avatar {
+                            key = "delay"
+                            src = it
+                        } } ?: Avatar {
+                            key = "delay"
+                            children = pl.name[0].toString().toUpperCase()
+                        }
+                        primaryText = pl.name
+                        secondaryText = "${pl.owner.displayName} -- ${pl.tracks.total} songs"
+                        onClick = { onPlSelected(pl) }
+                    }
+                }
+            } else {
+                i { +"No playlists found" }
             }
-        }
-        div {
-            AppBar {
-                title = "Spotify Shuffler"
-                iconElementRight = logoutBt
-            }
-            div("pl-body") {
-                if (state.playlists.isNotEmpty()) List {
-                    className = "pl-list"
-                    children =
-                        Subheader { +"Playlists" }
-                        state.playlists.map { pl ->
+            if (state.selectedPlaylist != null) List {
+                className = "pl-tracks"
+                Subheader { +"Tracks -- ${state.selectedPlaylist!!.name}" }
+                if (state.selectedTracks != null) {
+                    state.selectedTracks!!.map { t ->
                         ListItem {
-                            rightIconButton = IconMenu {
-                                key = "delay"
-                                iconButtonElement = IconButton {
-                                    key = "delay"
-                                    tooltip = "options"
-                                    tooltipPosition = "bottom-left"
-                                    MoreVertIcon { color = "grey" }
-                                }
-                                MenuItem {
-                                    +"Shuffle"
-                                    onClick = { onShuffle(pl) }
-                                }
-                            }
-                            leftAvatar = pl.spotifyImages.firstOrNull()?.url?.let { Avatar {
-                                key = "delay"
-                                src = it
-                            } } ?: Avatar {
-                                key = "delay"
-                                children = pl.name[0].toString().toUpperCase()
-                            }
-                            primaryText = pl.name
-                            secondaryText = "${pl.owner.displayName} -- ${pl.tracks.total} songs"
-                            onClick = { onPlSelected(pl) }
+                            primaryText = t.track.name
+                            secondaryText = "${msToHMS(t.track.durationMs)} -- ${t.track.artists.map { it.name }.joinToString(", ")}"
                         }
                     }
                 } else {
-                    i { +"No playlists found" }
+                    span { +"Loading..." }
                 }
-                if (state.selectedPlaylist != null) List {
-                    className = "pl-tracks"
-                    Subheader { +"Tracks -- ${state.selectedPlaylist!!.name}" }
-                    if (state.selectedTracks != null) {
-                        state.selectedTracks!!.map { t ->
-                            ListItem {
-                                primaryText = t.track.name
-                                secondaryText = "${msToHMS(t.track.durationMs)} -- ${t.track.artists.map { it.name }.joinToString(", ")}"
-                            }
-                        }
-                    } else {
-                        span { +"Loading..." }
-                    }
-                } else {
-                    i { +"Select a playlist to see its tracks" }
-                }
+            } else {
+                i { +"Select a playlist to see its tracks" }
             }
         }
-
     }
 }

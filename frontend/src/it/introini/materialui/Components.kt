@@ -8,7 +8,11 @@ import react.ReactExternalComponentSpec
 private val MaterialUi: dynamic = runtime.wrappers.require("material-ui")
 private val MaterialUiStyles: dynamic = runtime.wrappers.require("material-ui/styles")
 private val MaterialUiSvgIcons: dynamic = runtime.wrappers.require("material-ui/svg-icons")
-private val MaterialUiSvgIconsNavigation: dynamic = runtime.wrappers.require("material-ui/svg-icons/navigation/more-vert")
+private val MaterialUiSvgIconsNavigationMoreVert: dynamic = runtime.wrappers.require("material-ui/svg-icons/navigation/more-vert")
+private val MaterialUiSvgIconsNavigationMenu: dynamic = runtime.wrappers.require("material-ui/svg-icons/navigation/menu")
+private val MaterialUiSvgIconsNavigationClose: dynamic = runtime.wrappers.require("material-ui/svg-icons/navigation/close")
+private val MaterialUiSvgIconsAVLibraryMusic: dynamic = runtime.wrappers.require("material-ui/svg-icons/av/library-music")
+private val MaterialUiSvgIconsDeviceDevices: dynamic = runtime.wrappers.require("material-ui/svg-icons/device/devices")
 
 
 private val MuiThemeProvider: dynamic = MaterialUiStyles.MuiThemeProvider
@@ -19,14 +23,20 @@ open class BaseMUIProps(var id: String? = null,
                         var name: String? = null,
                         var className: String? = null): RProps()
 
-class MenuItemProps(var onClick: (Event) -> Unit): BaseMUIProps()
+class MenuItemProps(var leftIcon: Any? = null,
+                    var rightIcon: Any? = null,
+                    var onClick: (Event) -> Unit): BaseMUIProps()
 object MenuItem: ReactExternalComponentSpec<MenuItemProps>(MaterialUi.MenuItem)
 
 class IconMenuProps(var iconButtonElement: Any? = null): BaseMUIProps()
 object IconMenu: ReactExternalComponentSpec<IconMenuProps>(MaterialUi.IconMenu)
 
 class IconProps(var color: String? = null): BaseMUIProps()
-object MoreVertIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigation.default)
+object MoreVertIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigationMoreVert.default)
+object MenuIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigationMenu.default)
+object CloseIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigationClose.default)
+object LibraryMusicIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsAVLibraryMusic.default)
+object DevicesIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsDeviceDevices.default)
 
 class ButtonProps(var label: String? = null,
                   var primary: Boolean = false,
@@ -49,9 +59,13 @@ object TextField: ReactExternalComponentSpec<TextFieldProps>(MaterialUi.TextFiel
 class AppBarProps(var title: String? = null,
                   var iconElementRight: Any? = null,
                   var iconElementLeft: Any? = null,
+                  var onLeftIconButtonTouchTap: (Event) -> Unit,
                   var showMenuIconButton: Boolean = false,
-                  var iconClassNameLeft: String? = "muidocs-icon-navigation-expand-more" ): RProps()
+                  var iconClassNameLeft: String? = null ): RProps()
 object AppBar: ReactExternalComponentSpec<AppBarProps>(MaterialUi.AppBar)
+
+class DrawerProps(var open: Boolean = false): RProps()
+object Drawer: ReactExternalComponentSpec<DrawerProps>(MaterialUi.Drawer)
 
 object Subheader: ReactExternalComponentSpec<RProps>(MaterialUi.Subheader)
 
