@@ -19,25 +19,26 @@ import it.introini.spotifyplshuffler.manager.token.Token
 import org.pmw.tinylog.Logger
 import java.net.URLEncoder
 import java.util.*
-import kotlin.reflect.KClass
 
 
 class SpotifyClient @Inject constructor(val config: Config,
                                         val vertx: Vertx){
 
-    val AUTH_URL     = "https://accounts.spotify.com/authorize"
-    val TOKENS_URL   = "https://accounts.spotify.com/api/token"
+    private val AUTH_URL     = "https://accounts.spotify.com/authorize"
+    private val TOKENS_URL   = "https://accounts.spotify.com/api/token"
 
-    val BASE_API_URL        = "https://api.spotify.com/v1"
-    val ME_URL              = "$BASE_API_URL/me"
-    val ME_PLAYLISTS        = "$BASE_API_URL/me/playlists"
-    val PLAYLIST            = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}"
-    val ME_PLAYLIST_TRACKS  = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
-    val CREATE_PLAYLIST     = "$BASE_API_URL/users/{user_id}/playlists"
+    private val BASE_API_URL        = "https://api.spotify.com/v1"
+    private val ME_URL              = "$BASE_API_URL/me"
+    private val ME_PLAYLISTS        = "$BASE_API_URL/me/playlists"
+    private val PLAYLIST            = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}"
+    private val ME_PLAYLIST_TRACKS  = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
+    private val CREATE_PLAYLIST     = "$BASE_API_URL/users/{user_id}/playlists"
 
-    val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
+    private val DEVICES = "$ME_URL/player/devices"
 
-    val httpClient: HttpClient = vertx.createHttpClient()
+    private val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
+
+    private val httpClient: HttpClient = vertx.createHttpClient()
 
     fun getAuthorizeUrl(state: String): String {
         val clientId = config.getString(Parameter.CLIENT_ID)
@@ -253,6 +254,19 @@ class SpotifyClient @Inject constructor(val config: Config,
         return future
     }
 
+    fun getDevices(token: Token): Future<SpotifyDevices> {
+        val future = Future.future<SpotifyDevices>()
+        getRequest<SpotifyDevices>(DEVICES, token, object: TypeReference<SpotifyDevices>() {}).let {
+            (error, data) ->
+                if (error != null) {
+                    future.fail(error)
+                } else {
+                    future.complete(data)
+                }
+        }
+        return future
+    }
+
     // private utils
 
     private fun getTokenAuthorizationHeader(accessToken: String): Pair<String, String> {
@@ -273,25 +287,23 @@ class SpotifyClient @Inject constructor(val config: Config,
         val (_, response, result) = Fuel.get(url).header(auth).timeout(5000).responseString()
         Logger.info("Received response ${response.httpStatusCode}")
         result.let { (data, error) ->
-            if (error != null) {
-                try {
-                    return Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
+            when {
+                error != null -> return try {
+                    Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), null)
                 } catch (t: Throwable) {
-                    return Pair(t, null)
+                    Pair(t, null)
                 }
-            } else if (data != null) {
-                try {
+                data != null -> return try {
                     if (typeReference == null) {
-                        return Pair(null, data.let { JsonObject(it) }.mapTo(T::class.java))
+                        Pair(null, data.let { JsonObject(it) }.mapTo(T::class.java))
                     } else {
-                        return Pair(null, Json.mapper.convertValue(data.let { JsonObject(it).map }, typeReference))
+                        Pair(null, Json.mapper.convertValue(data.let { JsonObject(it).map }, typeReference))
                     }
                 } catch (t: Throwable) {
                     Logger.error(t, "Unknown exception")
-                    return Pair(t, null)
+                    Pair(t, null)
                 }
-            } else {
-                return Pair(IllegalStateException("data and error both null"), null)
+                else -> return Pair(IllegalStateException("data and error both null"), null)
             }
         }
     }

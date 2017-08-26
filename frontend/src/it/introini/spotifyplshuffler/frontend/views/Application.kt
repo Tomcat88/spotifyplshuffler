@@ -56,7 +56,7 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
                         switchView = { setState { view = it }}
                     }
                     DevicesView {
-
+                        userId = state.userId!!
                     }
                 }
             }

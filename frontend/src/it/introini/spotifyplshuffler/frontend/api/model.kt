@@ -87,5 +87,11 @@ data class SpotifyArtist (
     val uri: String?
 )
 
-
-
+data class SpotifyDevice (
+    val id: String?,
+    val isActive: Boolean,
+    val isRestricted: Boolean,
+    val name: String,
+    val type: String,
+    val volumePercent: Int?
+)

@@ -146,6 +146,21 @@ data class SpotifyArtist (
     @JsonProperty("uri")  val uri: String?
 ): Encodable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SpotifyDevices (
+        @JsonProperty("devices") val devices: Collection<SpotifyDevice>
+): Encodable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SpotifyDevice (
+    @JsonProperty("id")             val id: String?,
+    @JsonProperty("is_active")      val isActive: Boolean,
+    @JsonProperty("is_restricted")  val isRestricted: Boolean,
+    @JsonProperty("name")           val name: String,
+    @JsonProperty("type")           val type: String,
+    @JsonProperty("volume_percent") val volumePercent: Int?
+): Encodable
+
 // ==== ERRORS ====
 
 data class SpotifyApiException( @JsonProperty("error") val error: RegularErrorObject): RuntimeException()

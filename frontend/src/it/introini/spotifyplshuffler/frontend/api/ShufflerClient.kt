@@ -38,6 +38,15 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun getDevices(userId: String): Collection<SpotifyDevice> {
+        val auth = getAuthHeader(userId)
+        return async {
+            getAndParseResult("$BASE_API/devices", auth, null, this::parseSpotifyDevices)
+        }.await()
+    }
+
+    // private utils
+
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {
         val array = json as Array<dynamic>
         return array.map { t ->
@@ -128,6 +137,18 @@ open class ShufflerClient {
                 json.previous,
                 json.total
         )
+    }
+
+    private fun parseSpotifyDevices(json: dynamic): Collection<SpotifyDevice> {
+       val array = json as Array<dynamic>
+       return array.map { SpotifyDevice(
+               it.id,
+               it.isActive,
+               it.isRestricted,
+               it.name,
+               it.type,
+               it.volumePercent
+       ) }
     }
 }
 
