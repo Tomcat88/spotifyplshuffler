@@ -37,6 +37,9 @@ object MenuIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigat
 object CloseIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsNavigationClose.default)
 object LibraryMusicIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsAVLibraryMusic.default)
 object DevicesIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsDeviceDevices.default)
+object ComputerIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/computer").default)
+object SmartphoneIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/smartphone").default)
+object SpeakerIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/speaker").default)
 
 class ButtonProps(var label: String? = null,
                   var primary: Boolean = false,
@@ -72,7 +75,9 @@ object Subheader: ReactExternalComponentSpec<RProps>(MaterialUi.Subheader)
 private val MaterialUiList: dynamic = runtime.wrappers.require("material-ui/List")
 class  ListProps: BaseMUIProps()
 object List: ReactExternalComponentSpec<ListProps>(MaterialUiList.List)
-class  ListItemProps(var leftAvatar: Any? = null,
+class  ListItemProps(var leftIcon: Any? = null,
+                     var rightIcon: Any? = null,
+                     var leftAvatar: Any? = null,
                      var rightIconButton: Any? = null,
                      var primaryText: String? = null,
                      var secondaryText: String? = null,

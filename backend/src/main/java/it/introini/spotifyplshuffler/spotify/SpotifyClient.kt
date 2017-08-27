@@ -236,21 +236,30 @@ class SpotifyClient @Inject constructor(val config: Config,
         return future
     }
 
-    fun addTracks(token: Token, uid: String, pid: String, trackIds: Collection<String>): Future<JsonObject> {
-        val future = Future.future<JsonObject>()
-        val data = JsonObject()
-        data.put("uris", trackIds.toList().let { JsonArray(it) })
+    fun addTracks(token: Token, uid: String, pid: String, trackIds: Collection<String>): Future<JsonArray> {
+        val future = Future.future<JsonArray>()
         val formattedUrl = ME_PLAYLIST_TRACKS.replace("{user_id}", uid)
                                              .replace("{playlist_id}", pid)
-
-        postRequest<JsonObject>(formattedUrl, token, data).let {
-            (error, data) ->
-            if (error != null) {
-                future.fail(error)
-            } else {
-                future.complete(data)
+        var done = false
+        val results = JsonArray()
+        var toAdd = trackIds
+        while (!done) {
+            val data = JsonObject()
+            data.put("uris", toAdd.take(100).toList().let { JsonArray(it) })
+            toAdd = toAdd.drop(100)
+            if (toAdd.isEmpty()) {
+                done = true
+            }
+            postRequest<JsonObject>(formattedUrl, token, data).let { (error, data) ->
+                if (error != null) {
+                    future.fail(error)
+                    done = true
+                } else {
+                    results.add(data)
+                }
             }
         }
+        future.complete(results)
         return future
     }
 

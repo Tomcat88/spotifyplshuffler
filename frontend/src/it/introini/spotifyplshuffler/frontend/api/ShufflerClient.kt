@@ -34,7 +34,7 @@ open class ShufflerClient {
     suspend fun shufflePlaylist(userId: String, pl: String, uid: String): Boolean {
         val auth = getAuthHeader(userId)
         return async {
-            postAndParseResult("$BASE_API/playlist/$uid/$pl/shuffle", auth, null, { it.snapshot_id != null })
+            postAndParseResult("$BASE_API/playlist/$uid/$pl/shuffle", auth, null, { it != null })
         }.await()
     }
 
