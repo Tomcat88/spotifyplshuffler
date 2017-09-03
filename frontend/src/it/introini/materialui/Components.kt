@@ -13,6 +13,7 @@ private val MaterialUiSvgIconsNavigationMenu: dynamic = runtime.wrappers.require
 private val MaterialUiSvgIconsNavigationClose: dynamic = runtime.wrappers.require("material-ui/svg-icons/navigation/close")
 private val MaterialUiSvgIconsAVLibraryMusic: dynamic = runtime.wrappers.require("material-ui/svg-icons/av/library-music")
 private val MaterialUiSvgIconsDeviceDevices: dynamic = runtime.wrappers.require("material-ui/svg-icons/device/devices")
+private val MaterialUiCard: dynamic = runtime.wrappers.require("material-ui/Card")
 
 
 private val MuiThemeProvider: dynamic = MaterialUiStyles.MuiThemeProvider
@@ -87,3 +88,13 @@ object ListItem: ReactExternalComponentSpec<ListItemProps>(MaterialUiList.ListIt
 class AvatarProps(var src: String? = null,
                   var size: Int? = null): BaseMUIProps()
 object Avatar: ReactExternalComponentSpec<AvatarProps>(MaterialUi.Avatar)
+
+class CardProps: BaseMUIProps()
+object Card: ReactExternalComponentSpec<CardProps>(MaterialUiCard.Card)
+class CardHeaderProps(var title: String? = null,
+                      var subtitle: String? = null,
+                      var avatar: Any? = null): BaseMUIProps()
+object CardHeader: ReactExternalComponentSpec<CardHeaderProps>(MaterialUiCard.CardHeader)
+class CardTextProps: BaseMUIProps()
+object CardText: ReactExternalComponentSpec<CardTextProps>(MaterialUiCard.CardText)
+object CardActions: ReactExternalComponentSpec<BaseMUIProps>(MaterialUiCard.CardActions)

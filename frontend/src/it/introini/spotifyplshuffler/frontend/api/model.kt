@@ -77,7 +77,9 @@ data class SpotifyTrack (
     val trackNumber: Int,
     val type: String,
     val uri: String
-)
+) {
+    fun getArtists(): String = artists.mapNotNull { it.name }.joinToString(",")
+}
 
 data class SpotifyArtist (
     val id: String?,

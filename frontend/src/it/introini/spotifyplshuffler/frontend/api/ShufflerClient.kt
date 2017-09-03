@@ -165,6 +165,7 @@ open class ShufflerClient {
     }
 
     private fun parseSpotifyCurrentPlayingContext(json: dynamic): SpotifyCurrentPlayingContext {
+        console.log(json)
         return SpotifyCurrentPlayingContext(
             parseSpotifyDevice(json.device),
             json.repeatState,
@@ -172,7 +173,7 @@ open class ShufflerClient {
             parseContextObject(json.context),
             json.timestamp,
             json.progressMs,
-            json.isPlaying,
+            json.playing,
             parseSpotifyTrack(json.item)
         )
     }

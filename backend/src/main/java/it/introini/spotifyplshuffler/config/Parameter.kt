@@ -9,7 +9,7 @@ enum class Parameter(val parameter: String, val default: Any) {
 
     CLIENT_ID     ("spotify.auth.client_id", "2fb703bd5e5440cfa007f3c6b41baa89"),
     CLIENT_SECRET ("spotify.auth.client_secret", "b4c369c23c7642f18bb89f83b823e7c3"),
-    SCOPES        ("spotify.auth.scopes", "playlist-read-private playlist-modify-private user-read-private user-read-email user-read-birthdate user-read-playback-state"),
+    SCOPES        ("spotify.auth.scopes", "playlist-read-private playlist-modify-private user-read-private user-read-email user-read-birthdate user-read-playback-state user-modify-playback-state"),
 
     MONGO_DB_NAME              ("mongo.db.name", "spotify_shuffler"),
     MONGO_DB_HOST              ("mongo.db.host", "localhost"),

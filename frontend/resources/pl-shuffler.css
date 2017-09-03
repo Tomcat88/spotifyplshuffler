@@ -21,6 +21,20 @@ body {
     overflow: auto;
 }
 
+.devices-body {
+    height: 91%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.devices {
+    width: 40%;
+}
+
+.playback {
+    width: 50%;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }

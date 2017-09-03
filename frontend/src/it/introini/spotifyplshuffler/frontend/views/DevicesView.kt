@@ -5,6 +5,7 @@ import it.introini.spotifyplshuffler.frontend.api.SpotifyCurrentPlayingContext
 import it.introini.spotifyplshuffler.frontend.api.SpotifyDevice
 import kotlinx.coroutines.experimental.launch
 import kotlinx.html.div
+import kotlinx.html.span
 import react.RProps
 import react.RState
 import react.ReactComponentSpec
@@ -31,6 +32,22 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
             }
         }
     }
+
+    private fun refreshPlayback() {
+        launch {
+            val pb = ShufflerClient.getPlayback(props.userId)
+            this.setState {
+                playback = pb
+            }
+        }
+
+    }
+
+    private fun getToggleLabel(): String? {
+        if (state.playback == null) return null
+        return if (state.playback!!.isPlaying) "stop" else "start"
+    }
+
     override fun ReactDOMBuilder.render() {
         div("devices-body") {
             div("devices") {
@@ -51,7 +68,27 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                 }
             }
             div("playback") {
-
+                Subheader { +"Currently playing" }
+                if (state.playback != null) {
+                    Card {
+                        CardHeader {
+                            title = state.playback!!.item?.name
+                            subtitle = state.playback!!.item?.getArtists()
+                        }
+                        CardText {
+                            +"Playing on ${state.playback!!.device?.name}"
+                        }
+                        CardActions {
+                            FlatButton {
+                                label = "refresh"
+                                onClick = { refreshPlayback() }
+                            }
+                            FlatButton {
+                                label = getToggleLabel()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
