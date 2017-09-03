@@ -17,6 +17,7 @@ interface ReactComponentSpec<T : ReactComponent<P, S>, P : RProps, S : RState>
 
 private var initWrapper: ReactComponentWrapper<*, *, *>? = null
 
+@Suppress("UNCHECKED_CAST", "UNUSED_ANONYMOUS_PARAMETER")
 abstract class ReactComponent<P : RProps, S : RState> : ReactExtensionProvider {
 
     internal val wrapper = initWrapper as ReactComponentWrapper<*, *, S>

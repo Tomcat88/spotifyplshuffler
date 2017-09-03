@@ -35,6 +35,7 @@ class SpotifyClient @Inject constructor(val config: Config,
     private val CREATE_PLAYLIST     = "$BASE_API_URL/users/{user_id}/playlists"
 
     private val DEVICES = "$ME_URL/player/devices"
+    private val PLAYBACK = "$ME_URL/player"
 
     private val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -274,6 +275,12 @@ class SpotifyClient @Inject constructor(val config: Config,
                 }
         }
         return future
+    }
+
+    fun getCurrentPlayback(token: Token): Future<SpotifyCurrentPlayingContext> {
+        return getRequest<SpotifyCurrentPlayingContext>(PLAYBACK, token).let {
+            (error, data) -> if (error != null) Future.failedFuture(error) else Future.succeededFuture(data)
+        }
     }
 
     // private utils

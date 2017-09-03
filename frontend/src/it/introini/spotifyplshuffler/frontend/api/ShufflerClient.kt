@@ -45,6 +45,13 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun getPlayback(userId: String): SpotifyCurrentPlayingContext {
+        val auth = getAuthHeader(userId)
+        return async {
+            getAndParseResult("$BASE_API/playback", auth, null, this::parseSpotifyCurrentPlayingContext)
+        }.await()
+    }
+
     // private utils
 
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {
@@ -58,7 +65,8 @@ open class ShufflerClient {
         }
     }
 
-    private fun parseSpotifyTrack(json: dynamic): SpotifyTrack {
+    private fun parseSpotifyTrack(json: dynamic): SpotifyTrack? {
+        if (json == null) return null
         val artists = json.artists as Array<dynamic>
         val markets = json.availableMarkets as Array<dynamic>
         return SpotifyTrack(
@@ -141,14 +149,41 @@ open class ShufflerClient {
 
     private fun parseSpotifyDevices(json: dynamic): Collection<SpotifyDevice> {
        val array = json as Array<dynamic>
-       return array.map { SpotifyDevice(
-               it.id,
-               it.isActive,
-               it.isRestricted,
-               it.name,
-               it.type,
-               it.volumePercent
-       ) }
+       return array.mapNotNull { parseSpotifyDevice(it) }
+    }
+
+    private fun parseSpotifyDevice(json: dynamic): SpotifyDevice? {
+        if (json == null) return null
+        return SpotifyDevice(
+                json.id,
+                json.isActive,
+                json.isRestricted,
+                json.name,
+                json.type,
+                json.volumePercent
+        )
+    }
+
+    private fun parseSpotifyCurrentPlayingContext(json: dynamic): SpotifyCurrentPlayingContext {
+        return SpotifyCurrentPlayingContext(
+            parseSpotifyDevice(json.device),
+            json.repeatState,
+            json.shuffleState,
+            parseContextObject(json.context),
+            json.timestamp,
+            json.progressMs,
+            json.isPlaying,
+            parseSpotifyTrack(json.item)
+        )
+    }
+
+    private fun parseContextObject(json: dynamic): SpotifyContextObject? {
+        if (json == null) return null
+        return SpotifyContextObject(
+                json.uri,
+                json.href,
+                json.type
+        )
     }
 }
 

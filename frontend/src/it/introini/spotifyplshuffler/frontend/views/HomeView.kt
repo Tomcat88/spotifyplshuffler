@@ -106,7 +106,7 @@ class HomeView: ReactDOMComponent<HomeViewProps, HomeViewState>() {
                 if (state.selectedTracks != null) {
                     state.selectedTracks!!.map { t ->
                         ListItem {
-                            primaryText = t.track.name
+                            primaryText = t.track!!.name
                             secondaryText = "${msToHMS(t.track.durationMs)} -- ${t.track.artists.map { it.name }.joinToString(", ")}"
                         }
                     }

@@ -59,7 +59,7 @@ data class TracksObject (
 data class SpotifyPlaylistTrack (
     val addedAt: Long,
     val isLocal: Boolean,
-    val track: SpotifyTrack
+    val track: SpotifyTrack?
 )
 
 data class SpotifyTrack (
@@ -94,4 +94,22 @@ data class SpotifyDevice (
     val name: String,
     val type: String,
     val volumePercent: Int?
+)
+
+
+data class SpotifyCurrentPlayingContext (
+    val device: SpotifyDevice?,
+    val repeatState: Boolean,
+    val shuffleState: Boolean,
+    val context: SpotifyContextObject?,
+    val timestamp: Long,
+    val progressMs: Long?,
+    val isPlaying: Boolean,
+    val item: SpotifyTrack?
+)
+
+data class SpotifyContextObject (
+    val uri: String,
+    val href: String?,
+    val type: String
 )

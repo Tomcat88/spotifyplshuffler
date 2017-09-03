@@ -161,6 +161,25 @@ data class SpotifyDevice (
     @JsonProperty("volume_percent") val volumePercent: Int?
 ): Encodable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SpotifyCurrentPlayingContext (
+        @JsonProperty("device")        val device: SpotifyDevice?,
+        @JsonProperty("repeat_state")  val repeatState: String,
+        @JsonProperty("shuffle_state") val shuffleState: Boolean,
+        @JsonProperty("context")       val context: SpotifyContextObject?,
+        @JsonProperty("timestamp")     val timestamp: Long,
+        @JsonProperty("progress_ms")   val progressMs: Long?,
+        @JsonProperty("is_playing")    val isPlaying: Boolean,
+        @JsonProperty("item")          val item: SpotifyTrack?
+): Encodable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SpotifyContextObject (
+        @JsonProperty("uri")  val uri: String,
+        @JsonProperty("href") val href: String?,
+        @JsonProperty("type") val type: String
+): Encodable
+
 // ==== ERRORS ====
 
 data class SpotifyApiException( @JsonProperty("error") val error: RegularErrorObject): RuntimeException()
