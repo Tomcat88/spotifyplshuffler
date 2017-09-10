@@ -1,17 +1,20 @@
 package it.introini.spotifyplshuffler.frontend.views
 
+import it.introini.spotifyplshuffler.frontend.api.PlaybackStatus
 import it.introini.spotifyplshuffler.frontend.api.ShufflerClient
 import it.introini.spotifyplshuffler.frontend.api.SpotifyCurrentPlayingContext
 import it.introini.spotifyplshuffler.frontend.api.SpotifyDevice
 import kotlinx.coroutines.experimental.launch
 import kotlinx.html.div
-import kotlinx.html.span
 import react.RProps
 import react.RState
 import react.ReactComponentSpec
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.materialui.*
+import runtime.wrappers.jsObject
+import kotlin.browser.document
+import kotlin.browser.window
 
 
 class DevicesViewProps(var userId: String): RProps()
@@ -43,15 +46,46 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
 
     }
 
-    private fun getToggleLabel(): String? {
+    private fun refreshDevices() {
+        launch {
+            val shufflerDevices = ShufflerClient.getDevices(props.userId)
+            this.setState {
+                devices = shufflerDevices
+            }
+        }
+
+    }
+
+    private fun getPlaybackStatus(): PlaybackStatus? {
         if (state.playback == null) return null
-        return if (state.playback!!.isPlaying) "stop" else "start"
+        return state.playback!!.getPlaybackStatus()
+    }
+
+    private fun stopPlayback() {
+        launch {
+            ShufflerClient.playbackControl(props.userId, true)
+            window.setTimeout({ refreshPlayback() }, 1500)
+        }
+    }
+
+    private fun startPlayback() {
+        launch {
+            ShufflerClient.playbackControl(props.userId, false)
+            window.setTimeout({ refreshPlayback() }, 1500)
+        }
     }
 
     override fun ReactDOMBuilder.render() {
         div("devices-body") {
             div("devices") {
-                Subheader { +"Devices" }
+                Subheader {
+                    +"Devices"
+                    IconButton {
+                        tooltip = "refresh"
+                        onClick = { refreshDevices() }
+                        RefreshIcon {}
+                    }
+                }
                 if (state.devices.isEmpty())
                     ListItem { primaryText = "No device found" }
                 else
@@ -79,12 +113,23 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                             +"Playing on ${state.playback!!.device?.name}"
                         }
                         CardActions {
-                            FlatButton {
-                                label = "refresh"
+                            IconButton {
+                                tooltip = "refresh"
                                 onClick = { refreshPlayback() }
+                                RefreshIcon {}
                             }
-                            FlatButton {
-                                label = getToggleLabel()
+                            when (getPlaybackStatus()) {
+                                PlaybackStatus.PAUSED -> IconButton {
+                                    tooltip = "play"
+                                    onClick = { startPlayback() }
+                                    PlayIcon {}
+                                }
+                                PlaybackStatus.PLAYING -> IconButton {
+                                    tooltip = "pause"
+                                    onClick = { stopPlayback() }
+                                    PauseIcon {}
+                                }
+                                else -> null
                             }
                         }
                     }

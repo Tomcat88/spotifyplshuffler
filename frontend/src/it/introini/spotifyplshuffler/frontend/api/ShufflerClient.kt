@@ -52,6 +52,14 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun playbackControl(userId: String, stop: Boolean = false, deviceId: String? = null): Boolean {
+        val auth = getAuthHeader(userId)
+        val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
+        return async {
+            getAndParseResult("$BASE_API/playback/control?op=${if (stop) "stop" else "start"}$deviceIdParam", auth, null, { it != null })
+        }.await()
+    }
+
     // private utils
 
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {

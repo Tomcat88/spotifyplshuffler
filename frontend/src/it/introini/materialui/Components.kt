@@ -22,7 +22,8 @@ object MaterialUiMuiThemeProvider: ReactExternalComponentSpec<ReactComponentNoPr
 
 open class BaseMUIProps(var id: String? = null,
                         var name: String? = null,
-                        var className: String? = null): RProps()
+                        var className: String? = null,
+                        var style: Any? = null): RProps()
 
 class MenuItemProps(var leftIcon: Any? = null,
                     var rightIcon: Any? = null,
@@ -41,6 +42,9 @@ object DevicesIcon: ReactExternalComponentSpec<IconProps>(MaterialUiSvgIconsDevi
 object ComputerIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/computer").default)
 object SmartphoneIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/smartphone").default)
 object SpeakerIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/hardware/speaker").default)
+object RefreshIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/navigation/refresh").default)
+object PauseIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/pause").default)
+object PlayIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/play-arrow").default)
 
 class ButtonProps(var label: String? = null,
                   var primary: Boolean = false,
@@ -52,7 +56,10 @@ object FlatButton   : ReactExternalComponentSpec<ButtonProps>(MaterialUi.FlatBut
 
 class IconButtonProps(var touch: Boolean = false,
                       var tooltip: String? = null,
-                      var tooltipPosition: String? = null ): BaseMUIProps()
+                      var tooltipPosition: String? = null,
+                      var onClick: (Event) -> Unit,
+                      var iconStyle: Any? = null,
+                      var iconClassName: String? = null): BaseMUIProps()
 object IconButton   : ReactExternalComponentSpec<IconButtonProps>(MaterialUi.IconButton)
 
 class TextFieldProps(var floatingLabelText: String? = null,

@@ -9,10 +9,10 @@ import it.introini.spotifyplshuffler.config.Parameter
 import it.introini.spotifyplshuffler.routes.RouteBinder
 import org.pmw.tinylog.Logger
 
-class App @Inject constructor(val vertx: Vertx,
-                              val router: Router,
-                              val routeBinder: RouteBinder,
-                              val config: Config) {
+class App @Inject constructor(private val vertx: Vertx,
+                              private val router: Router,
+                              private val routeBinder: RouteBinder,
+                              private val config: Config) {
 
     fun startup(future: Future<Void>) {
         startWebServer().setHandler {
@@ -26,7 +26,7 @@ class App @Inject constructor(val vertx: Vertx,
         }
     }
 
-    fun startWebServer(): Future<Void> {
+    private fun startWebServer(): Future<Void> {
         val future = Future.future<Void>()
         val port = config.getInt(Parameter.HTTP_PORT)
         val httpServer = vertx.createHttpServer()

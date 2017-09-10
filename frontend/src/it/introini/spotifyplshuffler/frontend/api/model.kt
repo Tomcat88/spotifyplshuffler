@@ -108,7 +108,16 @@ data class SpotifyCurrentPlayingContext (
     val progressMs: Long?,
     val isPlaying: Boolean,
     val item: SpotifyTrack?
-)
+) {
+    fun getPlaybackStatus(): PlaybackStatus {
+        return if (isPlaying) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
+    }
+}
+
+enum class PlaybackStatus {
+    PLAYING,
+    PAUSED
+}
 
 data class SpotifyContextObject (
     val uri: String,

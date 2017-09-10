@@ -36,6 +36,8 @@ class SpotifyClient @Inject constructor(val config: Config,
 
     private val DEVICES = "$ME_URL/player/devices"
     private val PLAYBACK = "$ME_URL/player"
+    private val START_PLAYBACK = "$PLAYBACK/play"
+    private val PAUSE_PLAYBACK = "$PLAYBACK/pause"
 
     private val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -283,7 +285,23 @@ class SpotifyClient @Inject constructor(val config: Config,
         }
     }
 
+    fun startPlayback(token: Token, deviceId: String?): Future<Void> {
+        return controlPlayback(START_PLAYBACK, token, deviceId)
+    }
+
+    fun stopPlayback(token: Token, deviceId: String?): Future<Void> {
+        return controlPlayback(PAUSE_PLAYBACK, token, deviceId)
+    }
+
+
     // private utils
+
+    private fun controlPlayback(url: String, token: Token, deviceId: String?): Future<Void> {
+        val devicePair = deviceId?.let { "device_id" to it }
+        return putRequest(url, devicePair?.let { listOf(it) } ?: emptyList(),  token).let {
+            (error, _) -> if (error != null) Future.failedFuture(error) else Future.succeededFuture()
+        }
+    }
 
     private fun getTokenAuthorizationHeader(accessToken: String): Pair<String, String> {
         return HttpHeaders.AUTHORIZATION.toString() to "Bearer $accessToken"
@@ -320,6 +338,29 @@ class SpotifyClient @Inject constructor(val config: Config,
                     Pair(t, null)
                 }
                 else -> return Pair(IllegalStateException("data and error both null"), null)
+            }
+        }
+    }
+
+    private fun putRequest(url: String, params: List<Pair<String, Any?>>? = null, token: Token): Pair<Throwable?, Boolean> {
+        val auth = getTokenAuthorizationHeader(token.accessToken)
+        Logger.info("Performing put request on endpoint $url")
+        val (_, response, result) = Fuel.put(url, params).header(auth).timeout(5000).responseString()
+        Logger.info("Received response ${response.httpStatusCode}")
+        result.let { (data, error) ->
+            return when {
+                error != null -> try {
+                    Pair(String(error.errorData).let { JsonObject(it) }.mapTo(SpotifyApiException::class.java), false)
+                } catch (t: Throwable) {
+                    Pair(t, false)
+                }
+                data != null -> try {
+                    Pair(null, true)
+                } catch (t: Throwable) {
+                    Logger.error(t, "Unknown exception")
+                    Pair(t, false)
+                }
+                else -> Pair(IllegalStateException("data and error both null"), false)
             }
         }
     }
