@@ -52,11 +52,11 @@ open class ShufflerClient {
         }.await()
     }
 
-    suspend fun playbackControl(userId: String, stop: Boolean = false, deviceId: String? = null): Boolean {
+    suspend fun playbackControl(userId: String, op: String, deviceId: String? = null): Boolean {
         val auth = getAuthHeader(userId)
-        val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
+        val deviceIdParam = (deviceId?.let { "?device_id=$it" }) ?: ""
         return async {
-            getAndParseResult("$BASE_API/playback/control?op=${if (stop) "stop" else "start"}$deviceIdParam", auth, null, { it != null })
+            getAndParseResult("$BASE_API/playback/control/$op$deviceIdParam", auth, null, { it != null })
         }.await()
     }
 

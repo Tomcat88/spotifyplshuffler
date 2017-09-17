@@ -12,8 +12,6 @@ import react.ReactComponentSpec
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.materialui.*
-import runtime.wrappers.jsObject
-import kotlin.browser.document
 import kotlin.browser.window
 
 
@@ -31,26 +29,18 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
             console.log(shufflerPlayback)
             this.setState {
                 devices = shufflerDevices
-                playback = shufflerPlayback
+                playback = if (shufflerPlayback.device?.id == null) null else shufflerPlayback
             }
         }
     }
 
-    private fun refreshPlayback() {
-        launch {
-            val pb = ShufflerClient.getPlayback(props.userId)
-            this.setState {
-                playback = pb
-            }
-        }
-
-    }
-
-    private fun refreshDevices() {
+    private fun refresh() {
         launch {
             val shufflerDevices = ShufflerClient.getDevices(props.userId)
+            val pb = ShufflerClient.getPlayback(props.userId)
             this.setState {
                 devices = shufflerDevices
+                playback = pb
             }
         }
 
@@ -63,17 +53,33 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
 
     private fun stopPlayback() {
         launch {
-            ShufflerClient.playbackControl(props.userId, true)
-            window.setTimeout({ refreshPlayback() }, 1500)
+            ShufflerClient.playbackControl(props.userId, "stop")
+            window.setTimeout({ refresh() }, 1500)
         }
     }
 
     private fun startPlayback() {
         launch {
-            ShufflerClient.playbackControl(props.userId, false)
-            window.setTimeout({ refreshPlayback() }, 1500)
+            ShufflerClient.playbackControl(props.userId, "start")
+            window.setTimeout({ refresh() }, 1500)
         }
     }
+
+
+    private fun skipToNext() {
+        launch {
+            ShufflerClient.playbackControl(props.userId, "next")
+            window.setTimeout({ refresh() }, 1500)
+        }
+    }
+
+    private fun skipToPrev() {
+        launch {
+            ShufflerClient.playbackControl(props.userId, "prev")
+            window.setTimeout({ refresh() }, 1500)
+        }
+    }
+
 
     override fun ReactDOMBuilder.render() {
         div("devices-body") {
@@ -82,7 +88,7 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                     +"Devices"
                     IconButton {
                         tooltip = "refresh"
-                        onClick = { refreshDevices() }
+                        onClick = { refresh() }
                         RefreshIcon {}
                     }
                 }
@@ -114,9 +120,9 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                         }
                         CardActions {
                             IconButton {
-                                tooltip = "refresh"
-                                onClick = { refreshPlayback() }
-                                RefreshIcon {}
+                                tooltip = "previous"
+                                onClick = { skipToPrev() }
+                                SkipPrevIcon {}
                             }
                             when (getPlaybackStatus()) {
                                 PlaybackStatus.PAUSED -> IconButton {
@@ -130,6 +136,11 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                                     PauseIcon {}
                                 }
                                 else -> null
+                            }
+                            IconButton {
+                                tooltip = "next"
+                                onClick = { skipToNext() }
+                                SkipNextIcon {}
                             }
                         }
                     }

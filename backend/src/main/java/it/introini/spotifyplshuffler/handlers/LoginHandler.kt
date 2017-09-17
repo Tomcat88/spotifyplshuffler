@@ -9,7 +9,8 @@ import it.introini.spotifyplshuffler.spotify.SpotifyClient
 import java.util.*
 
 
-class LoginHandler @Inject constructor(val spotifyClient: SpotifyClient, val stateManager: StateManager) : Handler<RoutingContext> {
+class LoginHandler @Inject constructor(val spotifyClient: SpotifyClient,
+                                       private val stateManager: StateManager) : Handler<RoutingContext> {
 
     override fun handle(event: RoutingContext) {
         val state = UUID.randomUUID().toString().slice(IntRange(0, 15))

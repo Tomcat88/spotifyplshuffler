@@ -45,6 +45,8 @@ object SpeakerIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.requi
 object RefreshIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/navigation/refresh").default)
 object PauseIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/pause").default)
 object PlayIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/play-arrow").default)
+object SkipPrevIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/skip-previous").default)
+object SkipNextIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/skip-next").default)
 
 class ButtonProps(var label: String? = null,
                   var primary: Boolean = false,

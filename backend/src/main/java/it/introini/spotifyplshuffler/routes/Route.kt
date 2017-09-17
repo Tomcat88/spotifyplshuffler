@@ -22,5 +22,5 @@ enum class Route(val method: HttpMethod, val endpoint: String, val handler: Clas
 
     DEVICES          (GET, "/devices", DevicesHandler::class.java),
     CURRENT_PLAYBACK (GET, "/playback", CurrentPlaybackHandler::class.java),
-    CONTROL_PLAYBACK (GET, "/playback/control", PlaybackControlHandler::class.java),
+    CONTROL_PLAYBACK (GET, "/playback/control/:op", PlaybackControlHandler::class.java),
 }

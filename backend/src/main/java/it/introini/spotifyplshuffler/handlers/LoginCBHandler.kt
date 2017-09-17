@@ -1,6 +1,5 @@
 package it.introini.spotifyplshuffler.handlers
 
-import com.github.kittinunf.fuel.core.interceptors.redirectResponseInterceptor
 import com.google.inject.Inject
 import io.netty.handler.codec.http.HttpHeaderNames
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -18,7 +17,7 @@ import org.pmw.tinylog.Logger
 import java.time.Instant
 import java.util.*
 
-class LoginCBHandler @Inject constructor(val stateManager: StateManager,
+class LoginCBHandler @Inject constructor(private val stateManager: StateManager,
                                          val spotifyClient: SpotifyClient,
                                          val tokenManager: TokenManager) : Handler<RoutingContext>{
     override fun handle(event: RoutingContext) {
