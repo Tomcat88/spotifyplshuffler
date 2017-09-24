@@ -80,6 +80,17 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
         }
     }
 
+    private fun shufflePlayback() {
+        launch {
+            ShufflerClient.shufflePlayback(props.userId, state.playback?.device?.id, !(isPlaybackShuffle()))
+            window.setTimeout({ refresh() }, 1500)
+        }
+    }
+
+    private fun isPlaybackShuffle(): Boolean {
+        return state.playback?.shuffleState ?: false
+    }
+
 
     override fun ReactDOMBuilder.render() {
         div("devices-body") {
@@ -141,6 +152,11 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                                 tooltip = "next"
                                 onClick = { skipToNext() }
                                 SkipNextIcon {}
+                            }
+                            IconButton {
+                                tooltip = "shuffle"
+                                onClick = { shufflePlayback() }
+                                ShuffleIcon { color = if (isPlaybackShuffle()) "green" else null }
                             }
                         }
                     }

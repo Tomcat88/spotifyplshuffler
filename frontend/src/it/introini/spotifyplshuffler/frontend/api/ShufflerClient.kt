@@ -60,6 +60,15 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun shufflePlayback(userId: String, deviceId: String? = null, shuffle: Boolean): Boolean {
+        val auth = getAuthHeader(userId)
+        val stateParam = "?state=$shuffle"
+        val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
+        return async {
+            getAndParseResult("$BASE_API/playback/shuffle$stateParam$deviceIdParam", auth, null, { it != null })
+        }.await()
+    }
+
     // private utils
 
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {

@@ -47,6 +47,7 @@ object PauseIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require
 object PlayIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/play-arrow").default)
 object SkipPrevIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/skip-previous").default)
 object SkipNextIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/skip-next").default)
+object ShuffleIcon: ReactExternalComponentSpec<IconProps>(runtime.wrappers.require("material-ui/svg-icons/av/shuffle").default)
 
 class ButtonProps(var label: String? = null,
                   var primary: Boolean = false,

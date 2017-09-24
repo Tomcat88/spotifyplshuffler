@@ -20,7 +20,8 @@ enum class Route(val method: HttpMethod, val endpoint: String, val handler: Clas
     CREATE_PLAYLIST  (POST, "/playlist/:uid",             CreatePlaylistHandler::class.java),
     SHUFFLE_PLAYLIST (POST, "/playlist/:uid/:pl/shuffle", CreateShuffledPlaylistHandler::class.java),
 
-    DEVICES          (GET, "/devices", DevicesHandler::class.java),
-    CURRENT_PLAYBACK (GET, "/playback", CurrentPlaybackHandler::class.java),
+    DEVICES          (GET, "/devices",              DevicesHandler::class.java),
+    CURRENT_PLAYBACK (GET, "/playback",             CurrentPlaybackHandler::class.java),
     CONTROL_PLAYBACK (GET, "/playback/control/:op", PlaybackControlHandler::class.java),
+    SHUFFLE_PLAYBACK (GET, "/playback/shuffle",     PlaybackShuffleHandler::class.java)
 }

@@ -34,13 +34,13 @@ class SpotifyClientImpl @Inject constructor(private val config: Config,
     private val ME_PLAYLIST_TRACKS  = "$BASE_API_URL/users/{user_id}/playlists/{playlist_id}/tracks"
     private val CREATE_PLAYLIST     = "$BASE_API_URL/users/{user_id}/playlists"
 
-    private val DEVICES = "$ME_URL/player/devices"
-    private val PLAYBACK = "$ME_URL/player"
-    private val START_PLAYBACK = "$PLAYBACK/play"
-    private val PAUSE_PLAYBACK = "$PLAYBACK/pause"
-
-    private val NEXT_PLAYBACK = "$PLAYBACK/next"
-    private val PREV_PLAYBACK = "$PLAYBACK/previous"
+    private val DEVICES          = "$ME_URL/player/devices"
+    private val PLAYBACK         = "$ME_URL/player"
+    private val START_PLAYBACK   = "$PLAYBACK/play"
+    private val PAUSE_PLAYBACK   = "$PLAYBACK/pause"
+    private val NEXT_PLAYBACK    = "$PLAYBACK/next"
+    private val PREV_PLAYBACK    = "$PLAYBACK/previous"
+    private val SHUFFLE_PLAYBACK = "$PLAYBACK/shuffle"
 
     private val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -87,7 +87,7 @@ class SpotifyClientImpl @Inject constructor(private val config: Config,
         encoder.addParam("redirect_uri", redirectUri)
         encoder.addParam("code", token.refreshToken)
         val body = encoder.toString().substring(1) // Strips '?'
-        val (_, response, result) = Fuel.post(TOKENS_URL).header(HttpHeaders.AUTHORIZATION.toString() to auth,
+        val (_, _, result) = Fuel.post(TOKENS_URL).header(HttpHeaders.AUTHORIZATION.toString() to auth,
                                                                  HttpHeaders.CONTENT_TYPE.toString() to "application/x-www-form-urlencoded")
                                                                  .body(body)
                                                                  .timeout(5000)
@@ -300,6 +300,14 @@ class SpotifyClientImpl @Inject constructor(private val config: Config,
 
     override fun skipToPrevPlayback(token: Token, deviceId: String?): Future<Void> {
         return skipPlayback(PREV_PLAYBACK, token, deviceId)
+    }
+
+    override fun toggleShufflePlayback(token: Token, deviceId: String?, state: Boolean): Future<Void> {
+        val stateParam = "?state=$state"
+        val deviceParam = deviceId?.let { "&device_id=$it" } ?: ""
+        return putRequest(SHUFFLE_PLAYBACK + stateParam + deviceParam, emptyList(),  token).let {
+            (error, _) -> if (error != null) Future.failedFuture(error) else Future.succeededFuture()
+        }
     }
 
     // private utils
