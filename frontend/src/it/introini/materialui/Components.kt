@@ -108,3 +108,11 @@ object CardHeader: ReactExternalComponentSpec<CardHeaderProps>(MaterialUiCard.Ca
 class CardTextProps: BaseMUIProps()
 object CardText: ReactExternalComponentSpec<CardTextProps>(MaterialUiCard.CardText)
 object CardActions: ReactExternalComponentSpec<BaseMUIProps>(MaterialUiCard.CardActions)
+
+class SliderProps(var value: Int = 0,
+                  var min: Int = 0,
+                  var max: Int = 100,
+                  var step: Int = 1,
+                  var disabled: Boolean = false,
+                  var onChange: (Event) -> Unit): BaseMUIProps()
+object Slider: ReactExternalComponentSpec<SliderProps>(MaterialUi.Slider)

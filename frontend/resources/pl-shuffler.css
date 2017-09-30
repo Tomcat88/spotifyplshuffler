@@ -43,3 +43,8 @@ body {
     width: 8px !important;
     height: 8px !important;
 }
+
+.progressSlider {
+    margin-left: 10px;
+    margin-right: 10px;
+}

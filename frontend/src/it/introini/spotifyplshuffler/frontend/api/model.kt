@@ -105,7 +105,7 @@ data class SpotifyCurrentPlayingContext (
     val shuffleState: Boolean,
     val context: SpotifyContextObject?,
     val timestamp: Long,
-    val progressMs: Long?,
+    val progressMs: Int?,
     val isPlaying: Boolean,
     val item: SpotifyTrack?
 ) {
