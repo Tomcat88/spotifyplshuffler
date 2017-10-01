@@ -27,4 +27,5 @@ interface SpotifyClient {
     fun skipToNextPlayback(token: Token, deviceId: String?): Future<Void>
     fun skipToPrevPlayback(token: Token, deviceId: String?): Future<Void>
     fun toggleShufflePlayback(token: Token, deviceId: String?, state: Boolean): Future<Void>
+    fun seekPlayback(token: Token, deviceId: String?, positionMs: Int): Future<Void>
 }

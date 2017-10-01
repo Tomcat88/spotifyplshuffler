@@ -66,6 +66,7 @@ data class SpotifyTrack (
     val id: String?,
     val name: String,
     val artists: Collection<SpotifyArtist>,
+    val album: SpotifyAlbum?,
     val availableMarkets: Collection<String>,
     val discNumber: Int,
     val durationMs: Int,
@@ -88,6 +89,22 @@ data class SpotifyArtist (
     val type: String?,
     val uri: String?
 )
+
+data class SpotifyAlbum (
+    val albumType: String,
+    val artists: Collection<SpotifyArtist>,
+    val availableMarkets: Collection<String>,
+    val href: String?,
+    val id: String?,
+    val spotifyImages: Collection<SpotifyImage>,
+    val name: String?,
+    val type: String,
+    val uri: String
+) {
+    fun getAlbumSmallestImage(): SpotifyImage? {
+        return spotifyImages.sortedBy { (it.height ?: 0) * (it.width ?: 0) }.firstOrNull()
+    }
+}
 
 data class SpotifyDevice (
     val id: String?,

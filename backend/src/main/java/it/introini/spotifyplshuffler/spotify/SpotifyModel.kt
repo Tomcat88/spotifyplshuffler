@@ -124,6 +124,7 @@ data class SpotifyTrack (
         @JsonProperty("id")                val id: String?,
         @JsonProperty("name")              val name: String,
         @JsonProperty("artists")           val artists: Collection<SpotifyArtist>,
+        @JsonProperty("album")             val album: SpotifyAlbum?,
         @JsonProperty("available_markets") val availableMarkets: Collection<String>,
         @JsonProperty("disc_number")       val discNumber: Int,
         @JsonProperty("duration_ms")       val durationMs: Int,
@@ -135,6 +136,19 @@ data class SpotifyTrack (
         @JsonProperty("track_number")      val trackNumber: Int,
         @JsonProperty("type")              val type: String,
         @JsonProperty("uri")               val uri: String
+): Encodable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SpotifyAlbum (
+    @JsonProperty("album_type")        val albumType: String,
+    @JsonProperty("artists")           val artists: Collection<SpotifyArtist>,
+    @JsonProperty("available_markets") val availableMarkets: Collection<String>,
+    @JsonProperty("href")              val href: String?,
+    @JsonProperty("id")                val id: String?,
+    @JsonProperty("images")            val spotifyImages: Collection<SpotifyImage>,
+    @JsonProperty("name")              val name: String?,
+    @JsonProperty("type")              val type: String,
+    @JsonProperty("uri")               val uri: String
 ): Encodable
 
 @JsonIgnoreProperties(ignoreUnknown = true)

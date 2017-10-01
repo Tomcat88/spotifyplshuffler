@@ -23,5 +23,6 @@ enum class Route(val method: HttpMethod, val endpoint: String, val handler: Clas
     DEVICES          (GET, "/devices",              DevicesHandler::class.java),
     CURRENT_PLAYBACK (GET, "/playback",             CurrentPlaybackHandler::class.java),
     CONTROL_PLAYBACK (GET, "/playback/control/:op", PlaybackControlHandler::class.java),
-    SHUFFLE_PLAYBACK (GET, "/playback/shuffle",     PlaybackShuffleHandler::class.java)
+    SHUFFLE_PLAYBACK (GET, "/playback/shuffle",     PlaybackShuffleHandler::class.java),
+    SEEK_PLAYBACK    (GET, "/playback/seek",        PlaybackSeekHandler::class.java)
 }

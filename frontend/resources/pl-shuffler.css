@@ -45,6 +45,20 @@ body {
 }
 
 .progressSlider {
+    width: 89%;
     margin-left: 10px;
     margin-right: 10px;
+}
+
+.progressContainer {
+    display: flex;
+}
+
+.progressTimer {
+    margin-top: 24px;
+    margin-left: 10px;
+}
+.durationTimer {
+    margin-top: 24px;
+    margin-left: 5px;
 }

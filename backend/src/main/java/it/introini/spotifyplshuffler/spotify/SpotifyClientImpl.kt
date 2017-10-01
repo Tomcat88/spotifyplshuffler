@@ -41,6 +41,7 @@ class SpotifyClientImpl @Inject constructor(private val config: Config,
     private val NEXT_PLAYBACK    = "$PLAYBACK/next"
     private val PREV_PLAYBACK    = "$PLAYBACK/previous"
     private val SHUFFLE_PLAYBACK = "$PLAYBACK/shuffle"
+    private val SEEK_PLAYBACK    = "$PLAYBACK/seek"
 
     private val redirectUri: String = "http://localhost:8082/shuffler/api/v1/logincb"
 
@@ -309,6 +310,15 @@ class SpotifyClientImpl @Inject constructor(private val config: Config,
             (error, _) -> if (error != null) Future.failedFuture(error) else Future.succeededFuture()
         }
     }
+
+    override fun seekPlayback(token: Token, deviceId: String?, positionMs: Int): Future<Void> {
+        val positionParam = "?position_ms=$positionMs"
+        val deviceParam = deviceId?.let { "&device_id=$it" } ?: ""
+        return putRequest(SEEK_PLAYBACK + positionParam + deviceParam, emptyList(), token).let {
+            (error, _) -> if (error != null) Future.failedFuture(error) else Future.succeededFuture()
+        }
+    }
+
 
     // private utils
 

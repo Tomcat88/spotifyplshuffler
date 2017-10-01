@@ -6,12 +6,15 @@ import it.introini.spotifyplshuffler.frontend.api.SpotifyCurrentPlayingContext
 import it.introini.spotifyplshuffler.frontend.api.SpotifyDevice
 import kotlinx.coroutines.experimental.launch
 import kotlinx.html.div
+import kotlinx.html.span
+import org.w3c.dom.events.Event
 import react.RProps
 import react.RState
 import react.ReactComponentSpec
 import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.materialui.*
+import runtime.wrappers.msToHMS
 import kotlin.browser.window
 
 
@@ -117,6 +120,16 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
         return state.playback?.shuffleState ?: false
     }
 
+    private fun seekPlayback(newValue: Int) {
+        if (state.timeoutId != null) {
+            window.clearInterval(state.timeoutId!!)
+        }
+        launch {
+            ShufflerClient.seekPlayback(props.userId, state.playback?.device?.id, newValue)
+            window.setTimeout({ refresh() }, 1500)
+        }
+    }
+
 
 
     override fun ReactDOMBuilder.render() {
@@ -152,13 +165,22 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                         CardHeader {
                             title = state.playback!!.item?.name
                             subtitle = state.playback!!.item?.getArtists()
+                            avatar = state.playback!!.item?.album?.getAlbumSmallestImage()?.url
                         }
-                        div("progressSlider") {
+                        div("progressContainer") {
                             if (state.playback!!.progressMs != null && state.playback!!.item?.durationMs != null) {
+                                span("progressTimer") {
+                                    +msToHMS(state.playback!!.progressMs!!)
+                                }
                                 Slider {
+                                    className = "progressSlider"
                                     min = 0
                                     max = state.playback!!.item?.durationMs!!
                                     value = state.playback!!.progressMs!!
+                                    onChange = { _, newValue -> seekPlayback(newValue) }
+                                }
+                                span("durationTimer") {
+                                    +msToHMS(state.playback!!.item?.durationMs!!)
                                 }
                             }
                         }

@@ -69,6 +69,15 @@ open class ShufflerClient {
         }.await()
     }
 
+    suspend fun seekPlayback(userId: String, deviceId: String? = null, positionMs: Int): Boolean {
+        val auth = getAuthHeader(userId)
+        val positionParam = "?position_ms=$positionMs"
+        val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
+        return async {
+            getAndParseResult("$BASE_API/playback/seek$positionParam$deviceIdParam", auth, null, { it != null })
+        }.await()
+    }
+
     // private utils
 
     private fun parseSpotifyPlaylistTracks(json: dynamic): Collection<SpotifyPlaylistTrack> {
@@ -90,6 +99,7 @@ open class ShufflerClient {
                 json.id,
                 json.name,
                 artists.map(this::parseSpotifyArtist),
+                parseSpotifyAlbum(json.album),
                 markets.map(Any::toString),
                 json.discNumber,
                 json.durationMs,
@@ -99,6 +109,25 @@ open class ShufflerClient {
                 json.popularity,
                 json.previewUrl,
                 json.trackNumber,
+                json.type,
+                json.uri
+        )
+    }
+
+    private fun parseSpotifyAlbum(json: dynamic): SpotifyAlbum? {
+        if (json == null) return null
+        val artists = json.artists as Array<dynamic>
+        val markets = json.availableMarkets as Array<dynamic>
+        val images = json.spotifyImages as Array<SpotifyImage>
+
+        return SpotifyAlbum(
+                json.albumType,
+                artists.map(this::parseSpotifyArtist),
+                markets.map(Any::toString),
+                json.href,
+                json.id,
+                images.map(this::parseSpotifyImage),
+                json.name,
                 json.type,
                 json.uri
         )
