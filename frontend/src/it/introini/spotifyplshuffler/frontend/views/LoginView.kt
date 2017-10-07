@@ -12,8 +12,7 @@ import react.dom.ReactDOMComponent
 import react.materialui.RaisedButton
 
 class LoginViewProps: RProps()
-class LoginViewState(var user: String? = null,
-                     var password: String? = null): RState
+class LoginViewState: RState
 class LoginView: ReactDOMComponent<LoginViewProps, LoginViewState>() {
     companion object: ReactComponentSpec<LoginView, LoginViewProps, LoginViewState>
 

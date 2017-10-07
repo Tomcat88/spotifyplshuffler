@@ -11,7 +11,7 @@ import react.materialui.*
 
 
 class ApplicationBarProps(var onLogout: () -> Unit,
-                          var switchView: (view: MainView) -> Unit): RProps()
+                          var switchView: (view: View) -> Unit): RProps()
 class ApplicationBarState(var drawerOpen: Boolean = false): RState
 
 class ApplicationBar: ReactDOMComponent<ApplicationBarProps, ApplicationBarState>() {
@@ -27,7 +27,7 @@ class ApplicationBar: ReactDOMComponent<ApplicationBarProps, ApplicationBarState
         }
     }
 
-    private fun onMenuItemClick(view: MainView) {
+    private fun onMenuItemClick(view: View) {
         toggleDrawer()
         props.switchView(view)
     }
@@ -67,7 +67,7 @@ class ApplicationBar: ReactDOMComponent<ApplicationBarProps, ApplicationBarState
                         key = "delay"
                     }
                     onClick = {
-                        onMenuItemClick(MainView.Playlists)
+                        onMenuItemClick(View.Playlists)
                     }
                     +"Playlists"
 
@@ -77,7 +77,7 @@ class ApplicationBar: ReactDOMComponent<ApplicationBarProps, ApplicationBarState
                         key = "delay"
                     }
                     onClick = {
-                        onMenuItemClick(MainView.Devices)
+                        onMenuItemClick(View.Devices)
                     }
                     +"Devices"
                 }

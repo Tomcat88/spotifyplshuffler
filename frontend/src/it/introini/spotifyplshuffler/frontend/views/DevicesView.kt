@@ -7,7 +7,6 @@ import it.introini.spotifyplshuffler.frontend.api.SpotifyDevice
 import kotlinx.coroutines.experimental.launch
 import kotlinx.html.div
 import kotlinx.html.span
-import org.w3c.dom.events.Event
 import react.RProps
 import react.RState
 import react.ReactComponentSpec
@@ -26,7 +25,7 @@ class DevicesViewState(var devices: Collection<SpotifyDevice> = emptyList(),
 class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
     companion object: ReactComponentSpec<DevicesView, DevicesViewProps, DevicesViewState>
 
-    private val PROGRESS:Int = 1000
+    private val progress:Int = 1000
 
     init {
         state = DevicesViewState()
@@ -44,7 +43,7 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                 window.setInterval({
                     val progress = state.playback?.progressMs ?: 0
                     val max = state.playback?.item?.durationMs ?: 0
-                    if (progress + PROGRESS >= max) {
+                    if (progress + this.progress >= max) {
                         refresh()
                     } else {
                         if (state.playback != null) {
@@ -55,14 +54,14 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                                         state.playback!!.shuffleState,
                                         state.playback!!.context,
                                         state.playback!!.timestamp,
-                                        progress + PROGRESS,
+                                        progress + this@DevicesView.progress,
                                         state.playback!!.isPlaying,
                                         state.playback!!.item
                                 )
                             }
                         }
                     }
-                }, PROGRESS)
+                }, progress)
             } else {
                 null
             }
@@ -201,7 +200,6 @@ class DevicesView: ReactDOMComponent<DevicesViewProps, DevicesViewState>() {
                                     onClick = { stopPlayback() }
                                     PauseIcon {}
                                 }
-                                else -> null
                             }
                             IconButton {
                                 tooltip = "next"

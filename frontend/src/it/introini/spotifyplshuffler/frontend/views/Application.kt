@@ -11,6 +11,7 @@ import react.dom.ReactDOMComponent
 import react.dom.render
 import react.materialui.MaterialUiMuiThemeProvider
 import kotlin.browser.document
+import kotlin.browser.window
 
 
 fun main(args: Array<String>) {
@@ -32,28 +33,42 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
     init {
         val userId = Cookies.get("userId")
         console.log(userId)
-        state = ApplicationState(getFirstView(userId), userId)
+        val path = window.location.pathname.removePrefix("/shuffler")
+        val view = getFirstView(userId, path)
+        changeUrl(view)
+        state = ApplicationState(view, userId)
+    }
+
+    private fun changeUrl(view: View) {
+        window.history.pushState(null, "Shuffler", "/shuffler${view.path}")
+    }
+
+    private fun onSwitchView(newView: View) {
+        this.setState {
+            view = newView
+        }
+        changeUrl(newView)
     }
 
     override fun ReactDOMBuilder.render() {
         div("content") {
             when (state.view) {
-                MainView.Login -> div {
+                View.Login -> div {
                     LoginView {}
                 }
-                MainView.Playlists -> div {
+                View.Playlists -> div {
                     ApplicationBar {
                         onLogout = { logout() }
-                        switchView = { setState { view = it }}
+                        switchView = { onSwitchView(it) }
                     }
                     HomeView {
                         userId = state.userId!!
                     }
                 }
-                MainView.Devices -> div {
+                View.Devices -> div {
                     ApplicationBar {
                         onLogout = { logout() }
-                        switchView = { setState { view = it }}
+                        switchView = { onSwitchView(it) }
                     }
                     DevicesView {
                         userId = state.userId!!
@@ -67,21 +82,25 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
         Cookies.remove("userId")
         setState {
             userId = null
-            view = MainView.Login
+            view = View.Login
         }
     }
 
-    private fun getFirstView(userId: String?): MainView {
-        return if (userId != null) MainView.Playlists
-               else                MainView.Login
+    private fun getFirstView(userId: String?, path: String): View {
+        return if (userId != null) View.parse(path) ?: View.Playlists
+               else                View.Login
     }
 }
 
-enum class MainView {
-    Login,
-    Playlists,
-    Devices
+enum class View(val path: String) {
+    Login("/"),
+    Playlists("/playlists"),
+    Devices("/devices");
+
+    companion object {
+        fun parse(path: String): View? = View.values().find { it.path == path }
+    }
 }
 
-class ApplicationState(var view: MainView,
+class ApplicationState(var view: View,
                        var userId: String? = null): RState

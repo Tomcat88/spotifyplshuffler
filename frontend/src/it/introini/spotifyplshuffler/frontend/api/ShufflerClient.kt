@@ -7,48 +7,48 @@ import org.w3c.fetch.RequestInit
 import kotlin.browser.window
 import kotlin.js.json
 
-val BASE_API = "/shuffler/api/v1"
-val LOGIN_ENDPOINT = "$BASE_API/login"
+val baseApi = "/shuffler/api/v1"
+val loginEndpoint = "$baseApi/login"
 
 open class ShufflerClient {
     companion object: ShufflerClient()
 
     fun login() {
-        window.location.href = LOGIN_ENDPOINT
+        window.location.href = loginEndpoint
     }
 
     suspend fun getPlaylist(userId: String): PagingObject<SpotifyPlaylist> {
         val auth = getAuthHeader(userId)
         return async {
-            getAndParseResult("$BASE_API/playlists", auth, null, { parsePagingObject(it, this::parseSpotifyPlaylist) })
+            getAndParseResult("$baseApi/playlists", auth, null, { parsePagingObject(it, this::parseSpotifyPlaylist) })
         }.await()
     }
 
     suspend fun getPlaylistTracks(userId: String, pl: String, uid: String): Collection<SpotifyPlaylistTrack> {
         val auth = getAuthHeader(userId)
         return async {
-            getAndParseResult("$BASE_API/playlist/$uid/$pl/tracks", auth, null, this::parseSpotifyPlaylistTracks)
+            getAndParseResult("$baseApi/playlist/$uid/$pl/tracks", auth, null, this::parseSpotifyPlaylistTracks)
         }.await()
     }
 
     suspend fun shufflePlaylist(userId: String, pl: String, uid: String): Boolean {
         val auth = getAuthHeader(userId)
         return async {
-            postAndParseResult("$BASE_API/playlist/$uid/$pl/shuffle", auth, null, { it != null })
+            postAndParseResult("$baseApi/playlist/$uid/$pl/shuffle", auth, null, { it != null })
         }.await()
     }
 
     suspend fun getDevices(userId: String): Collection<SpotifyDevice> {
         val auth = getAuthHeader(userId)
         return async {
-            getAndParseResult("$BASE_API/devices", auth, null, this::parseSpotifyDevices)
+            getAndParseResult("$baseApi/devices", auth, null, this::parseSpotifyDevices)
         }.await()
     }
 
     suspend fun getPlayback(userId: String): SpotifyCurrentPlayingContext {
         val auth = getAuthHeader(userId)
         return async {
-            getAndParseResult("$BASE_API/playback", auth, null, this::parseSpotifyCurrentPlayingContext)
+            getAndParseResult("$baseApi/playback", auth, null, this::parseSpotifyCurrentPlayingContext)
         }.await()
     }
 
@@ -56,7 +56,7 @@ open class ShufflerClient {
         val auth = getAuthHeader(userId)
         val deviceIdParam = (deviceId?.let { "?device_id=$it" }) ?: ""
         return async {
-            getAndParseResult("$BASE_API/playback/control/$op$deviceIdParam", auth, null, { it != null })
+            getAndParseResult("$baseApi/playback/control/$op$deviceIdParam", auth, null, { it != null })
         }.await()
     }
 
@@ -65,7 +65,7 @@ open class ShufflerClient {
         val stateParam = "?state=$shuffle"
         val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
         return async {
-            getAndParseResult("$BASE_API/playback/shuffle$stateParam$deviceIdParam", auth, null, { it != null })
+            getAndParseResult("$baseApi/playback/shuffle$stateParam$deviceIdParam", auth, null, { it != null })
         }.await()
     }
 
@@ -74,7 +74,7 @@ open class ShufflerClient {
         val positionParam = "?position_ms=$positionMs"
         val deviceIdParam = (deviceId?.let { "&device_id=$it" }) ?: ""
         return async {
-            getAndParseResult("$BASE_API/playback/seek$positionParam$deviceIdParam", auth, null, { it != null })
+            getAndParseResult("$baseApi/playback/seek$positionParam$deviceIdParam", auth, null, { it != null })
         }.await()
     }
 
@@ -255,5 +255,7 @@ suspend fun <T> requestAndParseResult(method: String, url: String, auth: Pair<St
         override var credentials: RequestCredentials? = "same-origin".asDynamic()
         override var headers: dynamic = json(*headers)
     }).await()
-    return parse(response.json().await())
+    val json = response.json().await()
+    console.info("response from $method $url", json)
+    return parse(json)
 }
