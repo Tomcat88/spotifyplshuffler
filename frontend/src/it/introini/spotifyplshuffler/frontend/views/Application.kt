@@ -10,6 +10,7 @@ import react.dom.ReactDOMBuilder
 import react.dom.ReactDOMComponent
 import react.dom.render
 import react.materialui.MaterialUiMuiThemeProvider
+import runtime.wrappers.jsObject
 import kotlin.browser.document
 import kotlin.browser.window
 
@@ -79,11 +80,12 @@ class Application: ReactDOMComponent<ReactComponentEmptyProps, ApplicationState>
     }
 
     private fun logout() {
-        Cookies.remove("userId")
+        Cookies.remove("userId", jsObject<dynamic> { this["path"] = "/shuffler" })
         setState {
             userId = null
             view = View.Login
         }
+        changeUrl(View.Login)
     }
 
     private fun getFirstView(userId: String?, path: String): View {

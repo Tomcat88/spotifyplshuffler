@@ -255,7 +255,10 @@ suspend fun <T> requestAndParseResult(method: String, url: String, auth: Pair<St
         override var credentials: RequestCredentials? = "same-origin".asDynamic()
         override var headers: dynamic = json(*headers)
     }).await()
+    if (response.status.toInt() == 401) throw TokenExpiredException()
     val json = response.json().await()
-    console.info("response from $method $url", json)
+    //console.info("response from $method $url", json)
     return parse(json)
 }
+
+class TokenExpiredException: Exception()
